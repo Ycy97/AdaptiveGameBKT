@@ -129,13 +129,13 @@
  "nextobjectid":1,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.10.2",
+ "tiledversion":"1.11.0",
  "tileheight":32,
  "tilesets":[
         {
          "columns":76,
          "firstgid":1,
-         "image":"ModernInterior\/Modern_Interiors_v41\/1_Interiors\/32x32\/Room_Builder_32x32.png",
+         "image":"themes\/Room_Builder_32x32.png",
          "imageheight":3488,
          "imagewidth":2432,
          "margin":0,
@@ -74981,7 +74981,7 @@
         {
          "columns":16,
          "firstgid":8285,
-         "image":"ModernInterior\/Modern_Interiors_v41\/1_Interiors\/32x32\/Theme_Sorter_32x32\/1_Generic_32x32.png",
+         "image":"themes\/1_Generic_32x32.png",
          "imageheight":2496,
          "imagewidth":512,
          "margin":0,
@@ -86268,7 +86268,7 @@
         {
          "columns":16,
          "firstgid":9533,
-         "image":"ModernInterior\/Modern_Interiors_v41\/1_Interiors\/32x32\/Theme_Sorter_32x32\/3_Bathroom_32x32.png",
+         "image":"themes\/3_Bathroom_32x32.png",
          "imageheight":1792,
          "imagewidth":512,
          "margin":0,
