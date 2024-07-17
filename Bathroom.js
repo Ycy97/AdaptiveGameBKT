@@ -90,7 +90,7 @@ class Bathroom extends Phaser.Scene {
         const cameraY = centerY - (mapHeight / 2);
         this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-        this.player = this.physics.add.sprite(432, 500, 'player');
+        this.player = this.physics.add.sprite(550, 445, 'player');
 
         // Set camera properties
         this.cameras.main.startFollow(this.player, true); // Make the camera follow the player
@@ -309,9 +309,9 @@ class Bathroom extends Phaser.Scene {
         const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
     
         // Define the text for the NPC dialog and links
-        const npcDialogText = "Here's a hint to help you with numbers.\n Check out these resources:";
-        const tipsLinkText = "Learn Numbers Tips";
-        const videoLinkText = "Watch Numbers Videos";
+        const npcDialogText = "Here's a hint to help you with Probability and Statistics.\n Check out these resources:";
+        const tipsLinkText = "Learn Probability and Statistics Tips";
+        const videoLinkText = "Watch Probability and Statistics Videos";
     
         // Set the width and height of the dialog box
         const dialogWidth = this.cameras.main.width * 0.8 / this.cameras.main.zoom;
@@ -351,7 +351,7 @@ class Bathroom extends Phaser.Scene {
     
         // Interactive links callbacks
         tipsLink.on('pointerdown', () => window.open('https://www.khanacademy.org/math/numbers', '_blank'));
-        videoLink.on('pointerdown', () => window.open('https://www.youtube.com/results?search_query=numbers+tutorials', '_blank'));
+        videoLink.on('pointerdown', () => window.open('https://www.youtube.com/results?search_query=probabilitystatistics+tutorials', '_blank'));
     
         // Create the close button
         const closeButton = this.add.text(cameraCenterX + 350, cameraCenterY + 150, 'Close', {
@@ -392,9 +392,9 @@ class Bathroom extends Phaser.Scene {
         
         //hardcoded
         // The text of the welcome message
-        const welcomeText = "Welcome to the 2nd Maths Escape Room!\n\n"+
+        const welcomeText = "Welcome to the final Maths Escape Room!\n\n"+
             "Your first clue is: \n\n" +
-            "Find the golden globe!"
+            "Mirror mirror not on the wall, who is the fairest of them all?"
         
         // Create the text object for the welcome message
         const message = this.add.text(cameraCenterX, cameraCenterY, welcomeText, {
@@ -476,13 +476,13 @@ class Bathroom extends Phaser.Scene {
     
     async fetchQuestions() {
         try {
-            const response = await fetch('http://127.0.0.1:5000/numbers');
+            const response = await fetch('http://127.0.0.1:5000/probabilityandstatistics');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             this.questions = await response.json();
         } catch (error) {
-            console.error('Error fetching numbers questions:', error);
+            console.error('Error fetching probability and statistics questions:', error);
             throw error; // rethrow to handle it in the calling context if needed
         }
     }
@@ -650,7 +650,7 @@ class Bathroom extends Phaser.Scene {
         //what i need is to log student id, skill id/name, correctness, question ID [[]]
         if (isCorrect) {
 
-            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 1, "Numbers");
+            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 1, "Probability");
             console.log("saved correct response");
 
             //call the BKT API new & update the knowledge state
@@ -677,7 +677,7 @@ class Bathroom extends Phaser.Scene {
             this.lastSolvedId = this.currentInteractable.properties['id'];
         }
         else{
-            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 0, "Numbers");
+            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 0, "Probability");
             console.log("saved wrong response");
             //call the BKT API new & update the knowledge state
             this.getMastery(this.knowledge_state, 0, 'easy', 0.8);
