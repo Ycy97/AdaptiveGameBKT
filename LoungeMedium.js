@@ -1,7 +1,7 @@
-class Bathroom extends Phaser.Scene {
+class LoungeMedium extends Phaser.Scene{
 
-    constructor() {
-        super('Bathroom')
+    constructor(){
+        super('LoungeMedium')
         this.isInteractable = false; // Add a flag to check for interactable state
         this.canInteract = true; // Flag to control interaction cooldown
         this.dialogText = null; // Placeholder for the dialog text object
@@ -19,38 +19,35 @@ class Bathroom extends Phaser.Scene {
         this.student_responses = [];
         this.knowledge_state = 0.1;
 
-        //hints need to be modified
         this.hints = {
-            1: 'That rubber duck seems oddly suspicious?',
-            2: 'What is in the basket?',
-            3: 'Find the plunger!',
-            4: 'Try looking for the kitchen towel!',
+            1: 'Grab a paddle and lets play ping-pong!',
+            2: 'Lets get some food from the picnic basket.',
+            3: 'Grab a pool stick and lets play pool!',
+            4: 'Lets sit on the couch and watch some TV',
             5: 'That was fun! Lets go to the next room!',
             // ... more hints
           };
     }
 
-// Preload function to load assets
-    preload() {
+    preload(){
 
-     // Load tileset images
-     this.load.image('bathroom', 'assets/themes/3_Bathroom_32x32.png');
-     this.load.image('door', 'assets/themes/1_Generic_32x32.png');
-     this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
-     this.load.image('npc', 'assets/themes/Premade_Character_32x32_05.png');
+        //Load tileset images
+        this.load.image('basement', 'assets/themes/14_Basement_32x32.png');
+        this.load.image('door', 'assets/themes/1_Generic_32x32.png');
+        this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
+        this.load.image('npc', 'assets/themes/Premade_Character_32x32_05.png');
 
-      // Load the Tiled map JSON file
-      this.load.tilemapTiledJSON('bathroomMap', 'assets/bathroom.json');
+        // Load the Tiled map JSON file
+        this.load.tilemapTiledJSON('loungeMapMedium', 'assets/lounge2.json');
 
-      this.load.spritesheet('player', 'assets/player.png', {
+        this.load.spritesheet('player', 'assets/player.png', {
 
-        frameWidth: 32,
-        frameHeight: 50,
-    });
+            frameWidth: 32,
+            frameHeight: 50,
+        });
     }
 
-// Create function to create the map
-    create() {
+    create(){
 
         this.fetchQuestions().then(() => {
             console.log('Questions loaded:', this.questions);
@@ -60,26 +57,22 @@ class Bathroom extends Phaser.Scene {
             console.error('Failed to load questions:', error);
         });
 
-        this.movespeed = 120;
+        this.movespeed = 120; // Adjust the value as needed
 
-        // Create the map object
-        const map = this.make.tilemap({key: 'bathroomMap'});
+        const map = this.make.tilemap({key: 'loungeMapMedium'});
 
-        // Add tilesets to the map
-        const bathroomTiles = map.addTilesetImage('Bathroom', 'bathroom');
+        const basementTiles = map.addTilesetImage('Basement', 'basement');
         const doorTiles = map.addTilesetImage('Doors', 'door');
         const roombuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
         const npcTiles = map.addTilesetImage('NPC', 'npc');
 
-        // Create layers from the map data
-        const layoutLayer = map.createLayer('Layout', [bathroomTiles, doorTiles, roombuilderTiles]);
-        const furnitureLayer = map.createLayer('Furniture', [bathroomTiles, doorTiles, roombuilderTiles]);
-        const miscLayer = map.createLayer('Misc', [bathroomTiles, doorTiles, roombuilderTiles]);
+        const layoutLayer = map.createLayer('Layout', [basementTiles, doorTiles, roombuilderTiles, npcTiles]);
+        const furnitureLayer = map.createLayer('Furniture', [basementTiles, doorTiles, roombuilderTiles, npcTiles]);
+        const miscLayer = map.createLayer('Misc', [basementTiles, doorTiles, roombuilderTiles, npcTiles]);
 
-        // Set collision for tiles with custom property "collision"
-        layoutLayer.setCollisionByProperty({ collision: true });
-        furnitureLayer.setCollisionByProperty({ collision: true });
-        miscLayer.setCollisionByProperty({ collision: true });
+        // layoutLayer.setCollisionByProperty({ collision: true });
+        // furnitureLayer.setCollisionByProperty({ collision: true });
+        // miscLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
         const centerX = this.cameras.main.width / 2;
@@ -90,7 +83,7 @@ class Bathroom extends Phaser.Scene {
         const cameraY = centerY - (mapHeight / 2);
         this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-        this.player = this.physics.add.sprite(550, 445, 'player');
+        this.player = this.physics.add.sprite(432, 300, 'player');
 
         // Set camera properties
         this.cameras.main.startFollow(this.player, true); // Make the camera follow the player
@@ -217,7 +210,7 @@ class Bathroom extends Phaser.Scene {
         this.createDialogComponents();
 
         let hudTextX = 500; // 500 pixels from the right edge
-        let hudTextY = 245; // 175 pixels from the top
+        let hudTextY = 175; // 175 pixels from the top
 
         // Create the HUD text at the specified position
         this.hudText = this.add.text(hudTextX, hudTextY, 'Passcode: ', {
@@ -226,7 +219,7 @@ class Bathroom extends Phaser.Scene {
         }).setScrollFactor(1).setOrigin(1, 0); // Align text to the top-right
 
         let timerX = 380; // 380 pixels from the right edge
-        let timerY = 205; // 155 pixels from the top
+        let timerY = 155; // 155 pixels from the top
 
         // Initialize the timer text
         this.timerText = this.add.text(timerX, timerY, 'Time: 10:00', {
@@ -238,8 +231,7 @@ class Bathroom extends Phaser.Scene {
         this.createWelcomeMessage();
     }
 
-    update() {
-
+    update(){
         // Reset velocity
         this.player.body.setVelocity(0);
 
@@ -270,7 +262,7 @@ class Bathroom extends Phaser.Scene {
 
         // Check if 'M' is pressed and switch to Classroom scene
         if (Phaser.Input.Keyboard.JustDown(keyM)) {
-            this.scene.start('LoungeMedium');
+            this.scene.start('Classroom');
         }
 
         // Reset the interactable state if not overlapping
@@ -301,7 +293,6 @@ class Bathroom extends Phaser.Scene {
         });
 
         this.hudText.setText(`Passcode: ${this.passcodeNumbers.join('')}`);
-
     }
 
     showNPCDialog() {
@@ -309,9 +300,9 @@ class Bathroom extends Phaser.Scene {
         const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
     
         // Define the text for the NPC dialog and links
-        const npcDialogText = "Here's a hint to help you with Probability and Statistics.\n Check out these resources:";
-        const tipsLinkText = "Learn Probability and Statistics Tips";
-        const videoLinkText = "Watch Probability and Statistics Videos";
+        const npcDialogText = "Here's a hint to help you with algebra.\n Check out these resources:";
+        const tipsLinkText = "Learn Algebra Tips";
+        const videoLinkText = "Watch Algebra Videos";
     
         // Set the width and height of the dialog box
         const dialogWidth = this.cameras.main.width * 0.8 / this.cameras.main.zoom;
@@ -350,8 +341,8 @@ class Bathroom extends Phaser.Scene {
           .setScrollFactor(0);
     
         // Interactive links callbacks
-        tipsLink.on('pointerdown', () => window.open('https://www.khanacademy.org/math/numbers', '_blank'));
-        videoLink.on('pointerdown', () => window.open('https://www.youtube.com/results?search_query=probabilitystatistics+tutorials', '_blank'));
+        tipsLink.on('pointerdown', () => window.open('https://www.khanacademy.org/math/algebra', '_blank'));
+        videoLink.on('pointerdown', () => window.open('https://www.youtube.com/results?search_query=algebra+tutorials', '_blank'));
     
         // Create the close button
         const closeButton = this.add.text(cameraCenterX + 350, cameraCenterY + 150, 'Close', {
@@ -392,9 +383,11 @@ class Bathroom extends Phaser.Scene {
         
         //hardcoded
         // The text of the welcome message
-        const welcomeText = "Welcome to the final Maths Escape Room!\n\n"+
-            "Your first clue is: \n\n" +
-            "Mirror mirror not on the wall, who is the fairest of them all?"
+        const welcomeText = "Welcome to the Maths Escape Room!\n\n" +
+            "Use W, A, S, D to move around.\n" +
+            "Use E to interact with objects.\n\n" +
+            "Your first clue is: \n" +//+ this.hints[1]; // Use the first hint as an example
+            "Lets play some games at the arcade machine."
         
         // Create the text object for the welcome message
         const message = this.add.text(cameraCenterX, cameraCenterY, welcomeText, {
@@ -476,13 +469,13 @@ class Bathroom extends Phaser.Scene {
     
     async fetchQuestions() {
         try {
-            const response = await fetch('http://127.0.0.1:5000/probabilityandstatistics');
+            const response = await fetch('http://127.0.0.1:5000/algebra');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             this.questions = await response.json();
         } catch (error) {
-            console.error('Error fetching probability and statistics questions:', error);
+            console.error('Error fetching algebra questions:', error);
             throw error; // rethrow to handle it in the calling context if needed
         }
     }
@@ -628,16 +621,11 @@ class Bathroom extends Phaser.Scene {
         this.answerButtons.forEach(button => button.setVisible(false));
     
         // Get the correct answer for the current question
-        const correctAnswer = this.currentQuestion.correct_answer.toString();
-        console.log("The correct answer is : ", correctAnswer);
-        console.log("The correct answer type is ", typeof(correctAnswer));
-
+        const correctAnswer = this.currentQuestion.correct_answer;
+    
         // Check if the selected answer is correct
         const isCorrect = selected === correctAnswer;
-        console.log("The selected answer is ", selected);
-        console.log("The selected answer type is ", typeof(selected));
         const resultText = isCorrect ? 'Correct!' : 'Incorrect!';
-        console.log("The response : ", resultText);
     
         // Prepare the result lines
         let resultLines = [
@@ -650,7 +638,7 @@ class Bathroom extends Phaser.Scene {
         //what i need is to log student id, skill id/name, correctness, question ID [[]]
         if (isCorrect) {
 
-            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 1, "Probability");
+            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 1, "Algebra");
             console.log("saved correct response");
 
             //call the BKT API new & update the knowledge state
@@ -677,7 +665,7 @@ class Bathroom extends Phaser.Scene {
             this.lastSolvedId = this.currentInteractable.properties['id'];
         }
         else{
-            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 0, "Probability");
+            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 0, "Algebra");
             console.log("saved wrong response");
             //call the BKT API new & update the knowledge state
             this.getMastery(this.knowledge_state, 0, 'easy', 0.8);
@@ -751,7 +739,7 @@ class Bathroom extends Phaser.Scene {
     
                 if (userPasscode === this.passcodeNumbers.join('')) {
                     // Correct passcode
-                    this.scene.start('Bathroom');
+                    this.scene.start('Classroom');
                 } else {
                     // Incorrect passcode
                     this.showPopupMessage('Incorrect passcode.', 3000);

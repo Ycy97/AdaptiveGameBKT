@@ -14,7 +14,7 @@ let config = {
         // debug: true
       }
     },
-    scene: [Lounge, Bathroom, Classroom]
+    scene: [Lounge, Bathroom, Classroom, LoungeMedium]
   
 }
 
