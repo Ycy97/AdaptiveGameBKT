@@ -81250,6 +81250,21 @@
                          "name":"collision",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"door",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":6
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -87677,6 +87692,16 @@
                          "name":"collision",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -88687,7 +88712,7 @@
                         {
                          "name":"collision",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -88696,7 +88721,7 @@
                         {
                          "name":"collision",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -88833,6 +88858,16 @@
                          "name":"collision",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -91010,6 +91045,16 @@
                          "name":"collision",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -91245,6 +91290,16 @@
                          "name":"collision",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":3
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -92401,6 +92456,16 @@
                          "name":"collision",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":5
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {

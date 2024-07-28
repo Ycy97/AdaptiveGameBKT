@@ -21,10 +21,10 @@ class Bathroom extends Phaser.Scene {
 
         //hints need to be modified
         this.hints = {
-            1: 'Try looking at one of the bookshelves.',
-            2: 'That plant seems oddly suspicious?',
-            3: 'There is something written on the bookstand...',
-            4: 'Try to look out of the window?',
+            1: 'That rubber duck seems oddly suspicious?',
+            2: 'What is in the basket?',
+            3: 'Find the plunger!',
+            4: 'Try looking for the kitchen towel!',
             5: 'That was fun! Lets go to the next room!',
             // ... more hints
           };
