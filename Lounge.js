@@ -273,7 +273,7 @@ class Lounge extends Phaser.Scene {
 
         // Check if 'M' is pressed and switch to Classroom scene
         if (Phaser.Input.Keyboard.JustDown(keyM)) {
-            this.scene.start('Classroom');
+            this.scene.start('LoungeMedium');
         }
 
         // Reset the interactable state if not overlapping

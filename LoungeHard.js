@@ -1,7 +1,7 @@
-class LoungeMedium extends Phaser.Scene{
+class LoungeHard extends Phaser.Scene{
 
     constructor(){
-        super('LoungeMedium')
+        super('LoungeHard')
         this.isInteractable = false; // Add a flag to check for interactable state
         this.canInteract = true; // Flag to control interaction cooldown
         this.dialogText = null; // Placeholder for the dialog text object
@@ -17,7 +17,7 @@ class LoungeMedium extends Phaser.Scene{
         this.timerText = null;
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
-        this.knowledge_state = 0.5;
+        this.knowledge_state = 0.75; // obtained from previous room
 
         this.hints = {
             1: 'Grab a paddle and lets play ping-pong!',
@@ -31,15 +31,18 @@ class LoungeMedium extends Phaser.Scene{
 
     preload(){
 
-        //Load tileset images
-        this.load.image('basement', 'assets/themes/14_Basement_32x32.png');
+        //Load tileset images (Doors, Gym, Kitchen, Library, LivingRoom, Music,RoomBuilder, Upstairs)
         this.load.image('door', 'assets/themes/1_Generic_32x32.png');
-        this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
-        this.load.image('npc', 'assets/themes/Premade_Character_32x32_05.png');
+        this.load.image('gym', 'assets/themes/8_Gym_32x32.png');
+        this.load.image('kitchen', 'assets/themes/12_Kitchen_32x32.png');
+        this.load.image('library', 'assets/themes/5_Classroom_and_library_32x32.png');
+        this.load.image('livingRoom', 'assets/themes/2_LivingRoom_32x32.png');
         this.load.image('music', 'assets/themes/6_Music_and_sport_32x32.png');
+        this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
+        this.load.image('upstairs', 'assets/themes/17_Visibile_Upstairs_System_32x32.png');
 
         // Load the Tiled map JSON file
-        this.load.tilemapTiledJSON('loungeMapMedium', 'assets/lounge2.json');
+        this.load.tilemapTiledJSON('loungeMapHard', 'assets/lounge3.json');
 
         this.load.spritesheet('player', 'assets/player.png', {
 
@@ -49,7 +52,6 @@ class LoungeMedium extends Phaser.Scene{
     }
 
     create(){
-
         this.fetchQuestions().then(() => {
             console.log('Questions loaded:', this.questions);
             this.createDialogComponents();
@@ -59,42 +61,44 @@ class LoungeMedium extends Phaser.Scene{
         });
 
         this.movespeed = 120; // Adjust the value as needed
+        const map = this.make.tilemap({key: 'loungeMapHard'});
 
-        const map = this.make.tilemap({key: 'loungeMapMedium'});
-
-        const basementTiles = map.addTilesetImage('Basement', 'basement');
         const doorTiles = map.addTilesetImage('Doors', 'door');
-        const roombuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
-        const npcTiles = map.addTilesetImage('NPC', 'npc');
+        const gymTiles = map.addTilesetImage('Gym', 'gym');
+        const kitchenTiles = map.addTilesetImage('Kitchen', 'kitchen');
+        const libraryTiles = map.addTilesetImage('Library', 'library');
+        const livingRoomTiles = map.addTilesetImage('LivingRoom', 'livingRoom');
         const musicTiles = map.addTilesetImage('Music', 'music');
+        const roombuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
+        const upstairTiles = map.addTilesetImage('Upstairs', 'upstairs');
 
-        const layoutLayer = map.createLayer('Layout', [basementTiles, doorTiles, roombuilderTiles, npcTiles,musicTiles]);
-        const furnitureLayer = map.createLayer('Furniture', [basementTiles, doorTiles, roombuilderTiles, npcTiles,musicTiles]);
-        const miscLayer = map.createLayer('Misc', [basementTiles, doorTiles, roombuilderTiles, npcTiles,musicTiles]);
+        const layoutLayer = map.createLayer('Layout', [doorTiles,gymTiles,kitchenTiles,libraryTiles,livingRoomTiles,musicTiles,roombuilderTiles,upstairTiles]);
+        const topLevelLayer = map.createLayer('TopLevel', [doorTiles,gymTiles,kitchenTiles,libraryTiles,livingRoomTiles,musicTiles,roombuilderTiles,upstairTiles]);
+        const furnitureLayer = map.createLayer('Furnitures', [doorTiles,gymTiles,kitchenTiles,libraryTiles,livingRoomTiles,musicTiles,roombuilderTiles,upstairTiles]);
 
         // layoutLayer.setCollisionByProperty({ collision: true });
+        // topLevelLayer.setCollisionByProperty({ collision: true });
         // furnitureLayer.setCollisionByProperty({ collision: true });
-        // miscLayer.setCollisionByProperty({ collision: true });
 
-        // Center the map on the screen
-        const centerX = this.cameras.main.width / 2;
-        const centerY = this.cameras.main.height / 2;
-        const mapWidth = map.widthInPixels;
-        const mapHeight = map.heightInPixels;
-        const cameraX = centerX - (mapWidth / 2);
-        const cameraY = centerY - (mapHeight / 2);
-        this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+         // Center the map on the screen
+         const centerX = this.cameras.main.width / 2;
+         const centerY = this.cameras.main.height / 2;
+         const mapWidth = map.widthInPixels;
+         const mapHeight = map.heightInPixels;
+         const cameraX = centerX - (mapWidth / 2);
+         const cameraY = centerY - (mapHeight / 2);
+         this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+ 
+         this.player = this.physics.add.sprite(432, 300, 'player');
 
-        this.player = this.physics.add.sprite(432, 300, 'player');
-
-        // Set camera properties
+         // Set camera properties
         this.cameras.main.startFollow(this.player, true); // Make the camera follow the player
         this.cameras.main.setZoom(2.2); // Zoom in x2
 
         // Enable collisions between the player and the map layers
         this.physics.add.collider(this.player, layoutLayer);
         this.physics.add.collider(this.player, furnitureLayer);
-        this.physics.add.collider(this.player, miscLayer);
+        this.physics.add.collider(this.player, topLevelLayer);
 
         // player animations (walking)
         this.anims.create({
@@ -138,8 +142,8 @@ class LoungeMedium extends Phaser.Scene{
             }
         }, null, this);
 
-        // Overlap check for interactable objects in miscLayer
-        this.physics.add.overlap(this.player, miscLayer, (player, tile) => {
+        // Overlap check for interactable objects in topLevelLayer
+        this.physics.add.overlap(this.player, topLevelLayer, (player, tile) => {
             if (tile.properties.interactable) {
                 this.isInteractable = true;
                 this.currentInteractable = tile;
@@ -264,7 +268,7 @@ class LoungeMedium extends Phaser.Scene{
 
         // Check if 'M' is pressed and switch to Classroom scene
         if (Phaser.Input.Keyboard.JustDown(keyM)) {
-            this.scene.start('LoungeHard');
+            this.scene.start('Classroom');
         }
 
         // Reset the interactable state if not overlapping
@@ -741,7 +745,7 @@ class LoungeMedium extends Phaser.Scene{
     
                 if (userPasscode === this.passcodeNumbers.join('')) {
                     // Correct passcode
-                    this.scene.start('LoungeHard');
+                    this.scene.start('Classroom');
                 } else {
                     // Incorrect passcode
                     this.showPopupMessage('Incorrect passcode.', 3000);
@@ -818,5 +822,4 @@ class LoungeMedium extends Phaser.Scene{
             console.error('There was a problem with the fetch operation:', error);
         });
     }
-
 }
