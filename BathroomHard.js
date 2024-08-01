@@ -68,9 +68,9 @@ class BathroomHard extends Phaser.Scene{
         const groceryStoreTiles = map.addTilesetImage('GroceryStore', 'groceryStore');
         const iceCreamTiles = map.addTilesetImage('IceCream', 'iceCream');
 
-        const layoutLayer = map.createLayer('Layout', [bathroomTiles, doorTiles, roombuilderTiles,hospitalTiles,groceryStoreTiles,iceCreamTiles]);
-        const furnitureLayer = map.createLayer('Furnitures', [bathroomTiles, doorTiles, roombuilderTiles,hospitalTiles,groceryStoreTiles,iceCreamTiles]);
-        const miscLayer = map.createLayer('Misc', [bathroomTiles, doorTiles, roombuilderTiles,hospitalTiles,groceryStoreTiles,iceCreamTiles]);
+        const layoutLayer = map.createLayer('Layout', [bathroomTiles, doorTiles, roombuilderTiles,groceryStoreTiles,iceCreamTiles]);
+        const furnitureLayer = map.createLayer('Furnitures', [bathroomTiles, doorTiles, roombuilderTiles,groceryStoreTiles,iceCreamTiles]);
+        const miscLayer = map.createLayer('Misc', [bathroomTiles, doorTiles, roombuilderTiles,groceryStoreTiles,iceCreamTiles]);
 
         // layoutLayer.setCollisionByProperty({ collision: true });
         // furnitureLayer.setCollisionByProperty({ collision: true });
