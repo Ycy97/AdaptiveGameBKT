@@ -1,7 +1,7 @@
-class Classroom extends Phaser.Scene {
-
-    constructor() {
-        super("Classroom")
+class ClassroomHard extends Phaser.Scene{
+    
+    constructor(){
+        super("ClassroomHard")
         this.isInteractable = false; // Add a flag to check for interactable state
         this.canInteract = true; // Flag to control interaction cooldown
         this.dialogText = null; // Placeholder for the dialog text object
@@ -17,9 +17,8 @@ class Classroom extends Phaser.Scene {
         this.timerText = null;
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
-        this.knowledge_state = 0.1;
+        this.knowledge_state = 0.75;
 
-        //hints need to be modified
         this.hints = {
             1: 'Try looking at one of the bookshelves.',
             2: 'That plant seems oddly suspicious?',
@@ -30,27 +29,28 @@ class Classroom extends Phaser.Scene {
           };
     }
 
-// Preload function to load assets
-    preload() {
-
-        // Load tileset images
+    preload(){
+        //tileset image - Art, Classroom, Doors, Gym, Japan, Museum, Roombuilder, Upstairs
+        this.load.image('art', 'assets/themes/7_Art_32x32.png');
         this.load.image('classroom', 'assets/themes/5_Classroom_and_library_32x32.png');
         this.load.image('door', 'assets/themes/1_Generic_32x32.png');
         this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
-        this.load.image('npc', 'assets/themes/Premade_Character_32x32_05.png');
+        this.load.image('gym', 'assets/themes/8_Gym_32x32.png');
+        this.load.image('japan', 'assets/themes/20_Japanese_interiors_32x32.png');
+        this.load.image('museum', 'assets/themes/22_Museum_32x32.png');
+        this.load.image('upstairs', 'assets/themes/17_Visibile_Upstairs_System_32x32.png');
 
-        // Load the Tiled map JSON file
-        this.load.tilemapTiledJSON('classroomMap', 'assets/classroom.json');
+        this.load.tilemapTiledJSON('classroomMapHard', 'assets/classroom3.json');
 
         this.load.spritesheet('player', 'assets/player.png', {
 
             frameWidth: 32,
             frameHeight: 50,
         });
+
     }
 
-// Create function to create the map
-    create() {
+    create(){
 
         this.fetchQuestions().then(() => {
             console.log('Questions loaded:', this.questions);
@@ -59,28 +59,34 @@ class Classroom extends Phaser.Scene {
         }).catch(error => {
             console.error('Failed to load questions:', error);
         });
-
+        
         // Define movespeed
         this.movespeed = 120; // Adjust the value as needed
 
         // Create the map object
-        const map = this.make.tilemap({key: 'classroomMap'});
+        const map = this.make.tilemap({key: 'classroomMapHard'});
 
-        // Add tilesets to the map
+        //tileset image - Art, Classroom, Doors, Gym, Japan, Museum, Roombuilder, Upstairs
+        const artTiles = map.addTilesetImage('Art', 'art');
         const classroomTiles = map.addTilesetImage('Classroom', 'classroom');
         const doorTiles = map.addTilesetImage('Doors', 'door');
-        const roombuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
-        const npcTiles = map.addTilesetImage('NPC', 'npc');
+        const roomBuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
+        const gymTiles = map.addTilesetImage('Gym', 'gym');
+        const japanTiles = map.addTilesetImage('Japan', 'japan');
+        const museumTiles = map.addTilesetImage('Museum', 'museum');
+        const upstairTiles = map.addTilesetImage('Upstairs','upstairs')
 
-        // Create layers from the map data
-        const layoutLayer = map.createLayer('Layout', [classroomTiles, doorTiles, roombuilderTiles, npcTiles]);
-        const furnitureLayer = map.createLayer('Furniture', [classroomTiles, doorTiles, roombuilderTiles, npcTiles]);
-        const miscLayer = map.createLayer('Misc', [classroomTiles, doorTiles, roombuilderTiles, npcTiles]);
+        const layoutLayer = map.createLayer('Layout', [artTiles,classroomTiles,doorTiles,roomBuilderTiles,gymTiles,japanTiles,museumTiles,upstairTiles]);
+        const secondLayoutLayer = map.createLayer('SecondLayout', [artTiles,classroomTiles,doorTiles,roomBuilderTiles,gymTiles,japanTiles,museumTiles,upstairTiles]);
+        const furnitureLayer = map.createLayer('Furniture', [artTiles,classroomTiles,doorTiles,roomBuilderTiles,gymTiles,japanTiles,museumTiles,upstairTiles]);
+        const museumItemsLayer = map.createLayer('MuseumItems', [artTiles,classroomTiles,doorTiles,roomBuilderTiles,gymTiles,japanTiles,museumTiles,upstairTiles]);
+        const finalLayer = map.createLayer('FinalLayer', [artTiles,classroomTiles,doorTiles,roomBuilderTiles,gymTiles,japanTiles,museumTiles,upstairTiles]);
 
-        // Set collision for tiles with custom property "collision"
-        layoutLayer.setCollisionByProperty({ collision: true });
-        furnitureLayer.setCollisionByProperty({ collision: true });
-        miscLayer.setCollisionByProperty({ collision: true });
+        // layoutLayer.setCollisionByProperty({ collision: true });
+        // furnitureLayer.setCollisionByProperty({ collision: true });
+        // secondLayoutLayer.setCollisionByProperty({ collision: true });
+        // museumItemsLayer.setCollisionByProperty({ collision: true });
+        // finalLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
         const centerX = this.cameras.main.width / 2;
@@ -100,7 +106,9 @@ class Classroom extends Phaser.Scene {
         // Enable collisions between the player and the map layers
         this.physics.add.collider(this.player, layoutLayer);
         this.physics.add.collider(this.player, furnitureLayer);
-        this.physics.add.collider(this.player, miscLayer);
+        this.physics.add.collider(this.player, secondLayoutLayer);
+        this.physics.add.collider(this.player, museumItemsLayer);
+        this.physics.add.collider(this.player, finalLayer);
 
         // player animations (walking)
         this.anims.create({
@@ -144,8 +152,22 @@ class Classroom extends Phaser.Scene {
             }
         }, null, this);
 
-        // Overlap check for interactable objects in miscLayer
-        this.physics.add.overlap(this.player, miscLayer, (player, tile) => {
+        this.physics.add.overlap(this.player, museumItemsLayer, (player, tile) => {
+            if (tile.properties.interactable) {
+                this.isInteractable = true;
+                this.currentInteractable = tile;
+            }
+        }, null, this);
+
+        this.physics.add.overlap(this.player, finalLayer, (player, tile) => {
+            if (tile.properties.interactable) {
+                this.isInteractable = true;
+                this.currentInteractable = tile;
+            }
+        }, null, this);
+
+        // Overlap check for interactable objects in secondLayoutlayer
+        this.physics.add.overlap(this.player, secondLayoutLayer, (player, tile) => {
             if (tile.properties.interactable) {
                 this.isInteractable = true;
                 this.currentInteractable = tile;
@@ -238,10 +260,9 @@ class Classroom extends Phaser.Scene {
         // Now create the welcome message
         this.createWelcomeMessage();
 
-    }
-
-    update() {
-
+    } 
+    
+    update(){
         // Reset velocity
         this.player.body.setVelocity(0);
 
@@ -272,7 +293,7 @@ class Classroom extends Phaser.Scene {
 
         // Check if 'M' is pressed and switch to Classroom scene
         if (Phaser.Input.Keyboard.JustDown(keyM)) {
-            this.scene.start('ClassroomMedium');
+            this.scene.start('Bathroom');
         }
 
         // Reset the interactable state if not overlapping
@@ -303,7 +324,6 @@ class Classroom extends Phaser.Scene {
         });
 
         this.hudText.setText(`Passcode: ${this.passcodeNumbers.join('')}`);
-
     }
 
     showNPCDialog() {
@@ -753,7 +773,7 @@ class Classroom extends Phaser.Scene {
     
                 if (userPasscode === this.passcodeNumbers.join('')) {
                     // Correct passcode
-                    this.scene.start('ClassroomMedium');
+                    this.scene.start('Bathroom');
                 } else {
                     // Incorrect passcode
                     this.showPopupMessage('Incorrect passcode.', 3000);
@@ -830,5 +850,4 @@ class Classroom extends Phaser.Scene {
             console.error('There was a problem with the fetch operation:', error);
         });
     }
-
 }

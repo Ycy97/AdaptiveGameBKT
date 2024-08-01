@@ -1,7 +1,7 @@
-class Classroom extends Phaser.Scene {
+class ClassroomMedium extends Phaser.Scene{
 
-    constructor() {
-        super("Classroom")
+    constructor(){
+        super("ClassroomMedium")
         this.isInteractable = false; // Add a flag to check for interactable state
         this.canInteract = true; // Flag to control interaction cooldown
         this.dialogText = null; // Placeholder for the dialog text object
@@ -17,7 +17,7 @@ class Classroom extends Phaser.Scene {
         this.timerText = null;
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
-        this.knowledge_state = 0.1;
+        this.knowledge_state = 0.5;
 
         //hints need to be modified
         this.hints = {
@@ -28,19 +28,17 @@ class Classroom extends Phaser.Scene {
             5: 'That was fun! Lets go to the next room!',
             // ... more hints
           };
-    }
 
-// Preload function to load assets
-    preload() {
+    }//end of constructor
 
-        // Load tileset images
+    preload(){
+
         this.load.image('classroom', 'assets/themes/5_Classroom_and_library_32x32.png');
         this.load.image('door', 'assets/themes/1_Generic_32x32.png');
         this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
-        this.load.image('npc', 'assets/themes/Premade_Character_32x32_05.png');
-
-        // Load the Tiled map JSON file
-        this.load.tilemapTiledJSON('classroomMap', 'assets/classroom.json');
+        this.load.image('art', 'assets/themes/7_Art_32x32.png');
+        
+        this.load.tilemapTiledJSON('classroomMapMedium', 'assets/classroom2.json');
 
         this.load.spritesheet('player', 'assets/player.png', {
 
@@ -49,8 +47,7 @@ class Classroom extends Phaser.Scene {
         });
     }
 
-// Create function to create the map
-    create() {
+    create(){
 
         this.fetchQuestions().then(() => {
             console.log('Questions loaded:', this.questions);
@@ -59,28 +56,25 @@ class Classroom extends Phaser.Scene {
         }).catch(error => {
             console.error('Failed to load questions:', error);
         });
-
+        
         // Define movespeed
         this.movespeed = 120; // Adjust the value as needed
 
         // Create the map object
-        const map = this.make.tilemap({key: 'classroomMap'});
+        const map = this.make.tilemap({key: 'classroomMapMedium'});
 
-        // Add tilesets to the map
         const classroomTiles = map.addTilesetImage('Classroom', 'classroom');
         const doorTiles = map.addTilesetImage('Doors', 'door');
         const roombuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
-        const npcTiles = map.addTilesetImage('NPC', 'npc');
+        const artTiles = map.addTilesetImage('Art', 'art');
 
-        // Create layers from the map data
-        const layoutLayer = map.createLayer('Layout', [classroomTiles, doorTiles, roombuilderTiles, npcTiles]);
-        const furnitureLayer = map.createLayer('Furniture', [classroomTiles, doorTiles, roombuilderTiles, npcTiles]);
-        const miscLayer = map.createLayer('Misc', [classroomTiles, doorTiles, roombuilderTiles, npcTiles]);
+        const layoutLayer = map.createLayer('Layout', [classroomTiles, doorTiles, roombuilderTiles, artTiles]);
+        const furnitureLayer = map.createLayer('Furniture', [classroomTiles, doorTiles, roombuilderTiles, artTiles]);
+        const miscLayer = map.createLayer('Misc', [classroomTiles, doorTiles, roombuilderTiles, artTiles]);
 
-        // Set collision for tiles with custom property "collision"
-        layoutLayer.setCollisionByProperty({ collision: true });
-        furnitureLayer.setCollisionByProperty({ collision: true });
-        miscLayer.setCollisionByProperty({ collision: true });
+        // layoutLayer.setCollisionByProperty({ collision: true });
+        // furnitureLayer.setCollisionByProperty({ collision: true });
+        // miscLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
         const centerX = this.cameras.main.width / 2;
@@ -237,11 +231,9 @@ class Classroom extends Phaser.Scene {
 
         // Now create the welcome message
         this.createWelcomeMessage();
-
     }
 
-    update() {
-
+    update(){
         // Reset velocity
         this.player.body.setVelocity(0);
 
@@ -272,7 +264,7 @@ class Classroom extends Phaser.Scene {
 
         // Check if 'M' is pressed and switch to Classroom scene
         if (Phaser.Input.Keyboard.JustDown(keyM)) {
-            this.scene.start('ClassroomMedium');
+            this.scene.start('ClassroomHard');
         }
 
         // Reset the interactable state if not overlapping
@@ -303,7 +295,6 @@ class Classroom extends Phaser.Scene {
         });
 
         this.hudText.setText(`Passcode: ${this.passcodeNumbers.join('')}`);
-
     }
 
     showNPCDialog() {
@@ -753,7 +744,7 @@ class Classroom extends Phaser.Scene {
     
                 if (userPasscode === this.passcodeNumbers.join('')) {
                     // Correct passcode
-                    this.scene.start('ClassroomMedium');
+                    this.scene.start('ClassroomHard');
                 } else {
                     // Incorrect passcode
                     this.showPopupMessage('Incorrect passcode.', 3000);
@@ -831,4 +822,4 @@ class Classroom extends Phaser.Scene {
         });
     }
 
-}
+}//end of class 
