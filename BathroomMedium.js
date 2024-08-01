@@ -1,7 +1,7 @@
-class Bathroom extends Phaser.Scene {
-
-    constructor() {
-        super('Bathroom')
+class BathroomMedium extends Phaser.Scene{
+    
+    constructor(){
+        super('BathroomMedium')
         this.isInteractable = false; // Add a flag to check for interactable state
         this.canInteract = true; // Flag to control interaction cooldown
         this.dialogText = null; // Placeholder for the dialog text object
@@ -17,7 +17,7 @@ class Bathroom extends Phaser.Scene {
         this.timerText = null;
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
-        this.knowledge_state = 0.1;
+        this.knowledge_state = 0.5;
 
         //hints need to be modified
         this.hints = {
@@ -28,30 +28,28 @@ class Bathroom extends Phaser.Scene {
             5: 'That was fun! Lets go to the next room!',
             // ... more hints
           };
+
     }
 
-// Preload function to load assets
-    preload() {
+    preload(){
 
-     // Load tileset images
-     this.load.image('bathroom', 'assets/themes/3_Bathroom_32x32.png');
-     this.load.image('door', 'assets/themes/1_Generic_32x32.png');
-     this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
-     this.load.image('npc', 'assets/themes/Premade_Character_32x32_05.png');
+        //tileset imgs - Bathroom, Doors, Hospital, Roombuilder
+        this.load.image('bathroom', 'assets/themes/3_Bathroom_32x32.png');
+        this.load.image('door', 'assets/themes/1_Generic_32x32.png');
+        this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
+        this.load.image('hospital', 'assets/themes/19_Hospital_32x32.png');
 
-      // Load the Tiled map JSON file
-      this.load.tilemapTiledJSON('bathroomMap', 'assets/bathroom.json');
+        // Load the Tiled map JSON file
+        this.load.tilemapTiledJSON('bathroomMapMedium', 'assets/bathroom2.json');
 
-      this.load.spritesheet('player', 'assets/player.png', {
+        this.load.spritesheet('player', 'assets/player.png', {
 
-            frameWidth: 32,
-            frameHeight: 50,
-        });
+                frameWidth: 32,
+                frameHeight: 50,
+            });
     }
 
-// Create function to create the map
-    create() {
-
+    create(){
         this.fetchQuestions().then(() => {
             console.log('Questions loaded:', this.questions);
             this.createDialogComponents();
@@ -63,23 +61,20 @@ class Bathroom extends Phaser.Scene {
         this.movespeed = 120;
 
         // Create the map object
-        const map = this.make.tilemap({key: 'bathroomMap'});
+        const map = this.make.tilemap({key: 'bathroomMapMedium'});
 
-        // Add tilesets to the map
         const bathroomTiles = map.addTilesetImage('Bathroom', 'bathroom');
         const doorTiles = map.addTilesetImage('Doors', 'door');
         const roombuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
-        const npcTiles = map.addTilesetImage('NPC', 'npc');
+        const hospitalTiles = map.addTilesetImage('Hospital', 'hospital');
 
-        // Create layers from the map data
-        const layoutLayer = map.createLayer('Layout', [bathroomTiles, doorTiles, roombuilderTiles]);
-        const furnitureLayer = map.createLayer('Furniture', [bathroomTiles, doorTiles, roombuilderTiles]);
-        const miscLayer = map.createLayer('Misc', [bathroomTiles, doorTiles, roombuilderTiles]);
+        const layoutLayer = map.createLayer('Layout', [bathroomTiles, doorTiles, roombuilderTiles,hospitalTiles]);
+        const furnitureLayer = map.createLayer('Furnitures', [bathroomTiles, doorTiles, roombuilderTiles,hospitalTiles]);
+        const miscLayer = map.createLayer('Misc', [bathroomTiles, doorTiles, roombuilderTiles,hospitalTiles]);
 
-        // Set collision for tiles with custom property "collision"
-        layoutLayer.setCollisionByProperty({ collision: true });
-        furnitureLayer.setCollisionByProperty({ collision: true });
-        miscLayer.setCollisionByProperty({ collision: true });
+        // layoutLayer.setCollisionByProperty({ collision: true });
+        // furnitureLayer.setCollisionByProperty({ collision: true });
+        // miscLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
         const centerX = this.cameras.main.width / 2;
@@ -270,7 +265,7 @@ class Bathroom extends Phaser.Scene {
 
         // Check if 'M' is pressed and switch to Classroom scene
         if (Phaser.Input.Keyboard.JustDown(keyM)) {
-            this.scene.start('BathroomMedium');
+            this.scene.start('BathroomHard');
         }
 
         // Reset the interactable state if not overlapping
@@ -751,7 +746,7 @@ class Bathroom extends Phaser.Scene {
     
                 if (userPasscode === this.passcodeNumbers.join('')) {
                     // Correct passcode
-                    this.scene.start('BathroomMedium');
+                    this.scene.start('BathroomHard');
                 } else {
                     // Incorrect passcode
                     this.showPopupMessage('Incorrect passcode.', 3000);
@@ -828,5 +823,4 @@ class Bathroom extends Phaser.Scene {
             console.error('There was a problem with the fetch operation:', error);
         });
     }
-
 }
