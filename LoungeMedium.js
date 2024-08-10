@@ -65,16 +65,16 @@ class LoungeMedium extends Phaser.Scene{
         const basementTiles = map.addTilesetImage('Basement', 'basement');
         const doorTiles = map.addTilesetImage('Doors', 'door');
         const roombuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
-        const npcTiles = map.addTilesetImage('NPC', 'npc');
-        const musicTiles = map.addTilesetImage('Music', 'music');
+        //const npcTiles = map.addTilesetImage('NPC', 'npc');
+        const musicTiles = map.addTilesetImage('music', 'music');
 
-        const layoutLayer = map.createLayer('Layout', [basementTiles, doorTiles, roombuilderTiles, npcTiles,musicTiles]);
-        const furnitureLayer = map.createLayer('Furniture', [basementTiles, doorTiles, roombuilderTiles, npcTiles,musicTiles]);
-        const miscLayer = map.createLayer('Misc', [basementTiles, doorTiles, roombuilderTiles, npcTiles,musicTiles]);
+        const layoutLayer = map.createLayer('Layout', [basementTiles, doorTiles, roombuilderTiles,musicTiles]);
+        const furnitureLayer = map.createLayer('Furniture', [basementTiles, doorTiles, roombuilderTiles,musicTiles]);
+        const miscLayer = map.createLayer('Misc', [basementTiles, doorTiles, roombuilderTiles,musicTiles]);
 
-        // layoutLayer.setCollisionByProperty({ collision: true });
-        // furnitureLayer.setCollisionByProperty({ collision: true });
-        // miscLayer.setCollisionByProperty({ collision: true });
+        layoutLayer.setCollisionByProperty({ collision: true });
+        furnitureLayer.setCollisionByProperty({ collision: true });
+        miscLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
         const centerX = this.cameras.main.width / 2;
