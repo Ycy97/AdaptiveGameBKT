@@ -72,9 +72,9 @@ class ClassroomMedium extends Phaser.Scene{
         const furnitureLayer = map.createLayer('Furniture', [classroomTiles, doorTiles, roombuilderTiles, artTiles]);
         const miscLayer = map.createLayer('Misc', [classroomTiles, doorTiles, roombuilderTiles, artTiles]);
 
-        // layoutLayer.setCollisionByProperty({ collision: true });
-        // furnitureLayer.setCollisionByProperty({ collision: true });
-        // miscLayer.setCollisionByProperty({ collision: true });
+        layoutLayer.setCollisionByProperty({ collision: true });
+        furnitureLayer.setCollisionByProperty({ collision: true });
+        miscLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
         const centerX = this.cameras.main.width / 2;
