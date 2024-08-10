@@ -82,11 +82,11 @@ class ClassroomHard extends Phaser.Scene{
         const museumItemsLayer = map.createLayer('MuseumItems', [artTiles,classroomTiles,doorTiles,roomBuilderTiles,gymTiles,japanTiles,museumTiles,upstairTiles]);
         const finalLayer = map.createLayer('FinalLayer', [artTiles,classroomTiles,doorTiles,roomBuilderTiles,gymTiles,japanTiles,museumTiles,upstairTiles]);
 
-        // layoutLayer.setCollisionByProperty({ collision: true });
-        // furnitureLayer.setCollisionByProperty({ collision: true });
-        // secondLayoutLayer.setCollisionByProperty({ collision: true });
-        // museumItemsLayer.setCollisionByProperty({ collision: true });
-        // finalLayer.setCollisionByProperty({ collision: true });
+        layoutLayer.setCollisionByProperty({ collision: true });
+        furnitureLayer.setCollisionByProperty({ collision: true });
+        secondLayoutLayer.setCollisionByProperty({ collision: true });
+        museumItemsLayer.setCollisionByProperty({ collision: true });
+        finalLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
         const centerX = this.cameras.main.width / 2;
