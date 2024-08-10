@@ -76,9 +76,9 @@ class LoungeHard extends Phaser.Scene{
         const topLevelLayer = map.createLayer('TopLevel', [doorTiles,gymTiles,kitchenTiles,libraryTiles,livingRoomTiles,musicTiles,roombuilderTiles,upstairTiles]);
         const furnitureLayer = map.createLayer('Furnitures', [doorTiles,gymTiles,kitchenTiles,libraryTiles,livingRoomTiles,musicTiles,roombuilderTiles,upstairTiles]);
 
-        // layoutLayer.setCollisionByProperty({ collision: true });
-        // topLevelLayer.setCollisionByProperty({ collision: true });
-        // furnitureLayer.setCollisionByProperty({ collision: true });
+        layoutLayer.setCollisionByProperty({ collision: true });
+        topLevelLayer.setCollisionByProperty({ collision: true });
+        furnitureLayer.setCollisionByProperty({ collision: true });
 
          // Center the map on the screen
          const centerX = this.cameras.main.width / 2;
