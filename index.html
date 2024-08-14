@@ -60,7 +60,10 @@
             .then(data => {
                 alert(data.message);
                 if (data.message === 'Login successful!') {
-                    window.location.href = 'mainMenu.html';
+                    sessionStorage.setItem("username", document.forms[0].elements[0].value);
+                    setTimeout(function() {
+                        window.location.href = 'mainMenu.html';
+                    }, 500);  // 1000 milliseconds = 1 second
                 }
             })
             .catch(error => {

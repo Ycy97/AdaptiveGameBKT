@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, session, render_template, redirect, url_for
+from flask_session import Session
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 import mysql.connector
@@ -7,11 +8,14 @@ from bkt_model2 import update_knowledge
 
 app = Flask(__name__)
 app.secret_key = 'cy_secretKey'
-app.config.update(
-    SESSION_COOKIE_SECURE=False,  # Set to True if using HTTPS
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='None',  # Use 'Strict' if stricter rules are needed
-)
+# app.config.update(
+#     SESSION_COOKIE_SECURE=False,  # Set to True if using HTTPS
+#     SESSION_COOKIE_HTTPONLY=True,
+#     SESSION_COOKIE_SAMESITE='None',  # Use 'Strict' if stricter rules are needed
+# )
+# app.config["SESSION_PERMANENT"] = False
+# app.config["SESSION_TYPE"] = "filesystem"
+# Session(app)
 # Allow CORS for all domains on all routes
 CORS(app, resources={r"/*": {"origins": "*", "supports_credentials": True}})
 bcrypt = Bcrypt(app)
@@ -133,13 +137,12 @@ def gameLogin():
     auth_query = "SELECT * FROM users WHERE studentID =%s"
     cur.execute(auth_query, (username,))
     user = cur.fetchone()
-    session['username'] = username
 
     if user:
         stored_password_hash = user[1]
         if bcrypt.check_password_hash(stored_password_hash, password):
-            session['username'] = username
-            print("Session data after login:", session.get('username'))
+            #session['username'] = username
+            #print("Session data after login:", session.get('username'))
             cur.close()
             conn.close()
             return jsonify({'message' : 'Login successful!'}),200
@@ -178,16 +181,16 @@ def gameSignup():
 #API to logout user
 @app.route('/logout',methods=['POST'])
 def logout():
-    session.pop('username', None)
+    #session.pop('username', None)
     return jsonify({'message': 'Logged out successfully'}), 200
 
 #API path to retrieve session data
-@app.route('/getSession',methods=['GET'])
-def get_session():
-    if 'username' in session:
-        return jsonify({'username': session['username']})
-    else:
-        return jsonify({'message': 'No session data'}), 401
+# @app.route('/getSession',methods=['GET'])
+# def get_session():
+#     if 'username' in session:
+#         return jsonify({'username': session['username']})
+#     else:
+#         return jsonify({'message': 'No session data'}), 401
 
 
 if __name__ == '__main__':

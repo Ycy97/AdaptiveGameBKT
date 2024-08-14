@@ -48,32 +48,6 @@
             background-color: #45a049;
         }
     </style>
-    <script>
-       fetch('http://127.0.0.1:5000/getSession', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Process data
-            const userSession = data.username;
-            if (userSession) {
-                document.getElementById('greeting').textContent = `Welcome ${userSession} to Math Mystery, an Adaptive Math Escape Room Game!`;
-            }
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-        });
-
-    </script>
 </head>
 <body>
     <div class="container">
@@ -85,7 +59,22 @@
             <a href="profile.html">
                 <button id="profile-button">Profile</button>
             </a>
+            <button id="logout-button">Logout</button>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let username = sessionStorage.getItem("username");
+            document.getElementById('greeting').textContent = `Welcome ${username} to Math Mystery, an Adaptive Math Escape Room Game!`;
+        });
+
+        document.getElementById('logout-button').addEventListener('click', function() {
+            // Remove sessionStorage data
+            sessionStorage.removeItem("username");
+            // Redirect to login page
+            window.location.href = 'index.html'; // Adjust the URL if necessary
+        });
+    </script>
 </body>
 </html>
