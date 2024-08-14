@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Sign Up Page</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="assets/css/main.css" rel="stylesheet">
+</head>
+<body class="text-center">
+  <form class="form-signin">
+    <h1 class="h3 mb-3 font-weight-normal">Sign Up</h1>
+    <label for="username" class="sr-only">Username</label>
+    <input type="username" id="username" class="form-control" placeholder="Username" required autofocus>
+    <label for="password" class="sr-only">Password</label>
+    <input type="password" id="password" class="form-control" placeholder="Password" required>
+    <a class="btn btn-lg btn-primary btn-block" onClick="signUp()">Sign up</a>
+    <a href="index.html">Already have an account? Login here.</a>
+  </form>
+  <script>
+    function signUp() {
+      var data = {
+        username: document.forms[0].elements[0].value,
+        password: document.forms[0].elements[1].value,
+      };
+      fetch('http://127.0.0.1:5000/signup',{
+                method : 'POST',
+                headers :{
+                   'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                if (data.message === 'User registered successfully') {
+                    window.location.href = 'index.html';
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+  </script>
+</body>
+</html>

@@ -1,29 +1,73 @@
+<!-- This will be the sign in page as it is the landing page-->
+
 <!DOCTYPE html>
 <html lang="en">
+
+<!--header-->
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maths Escape Room</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login Page</title>
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="assets/css/main.css" rel="stylesheet">
 </head>
-<body>
-    <!--Load Phaser Library-->
-    <script src="phaser.min.js"></script>
 
-    <!--Load Phaser Game Scenes and Entrypoint-->
-    <script src="Lounge.js" defer></script>
-    <script src="LoungeMedium.js" defer></script>
-    <script src="LoungeHard.js" defer></script>
-    <script src="Classroom.js" defer></script>
-    <script src="ClassroomMedium.js" defer></script>
-    <script src="ClassroomHard.js" defer></script>
-    <script src="Bathroom.js" defer></script>
-    <script src="BathroomMedium.js" defer></script> 
-    <script src="BathroomHard.js" defer></script>  
-    <script src="Lose.js" defer></script>
+<body class="text-center">
+    <!--Sign in form-->
+    <form class="form-signin">
+        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        <label for="username" class="sr-only">Email address</label>
+        <input type="username" id="username" class="form-control" placeholder="Username" required autofocus>
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" id="password" class="form-control" placeholder="Password" required>
+        <a class="btn btn-lg btn-primary btn-block" onClick="signIn()">Sign in</a>
+        <a href="signup.html">Don't have an account? Sign up here.</a>
+        <a href="game.html">TestCY</a>
+    </form>
 
-    <!--Load other js before Main.js-->
-    <script src="Main.js" defer></script> 
-    
-    <!-- Game canvas will be added here by Phaser -->
+    <script>
+        function signIn() {
+            var data = {
+                username: document.forms[0].elements[0].value,
+                password: document.forms[0].elements[1].value
+            };
+            // $.ajax({
+            //     type: 'POST',
+            //     url: '/login',
+            //     data,
+            //     success: function (data) {
+            //     window.location.replace('game.html');
+            //     },
+            //     error: function (xhr) {
+            //     window.alert(JSON.stringify(xhr));
+            //     window.location.replace('index.html');
+            //     }
+            // });
+            fetch('http://127.0.0.1:5000/login',{
+                method : 'POST',
+                headers :{
+                   'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                if (data.message === 'Login successful!') {
+                    window.location.href = 'game.html';
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        }
+    </script>
 </body>
+
 </html>
