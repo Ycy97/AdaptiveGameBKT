@@ -651,7 +651,9 @@ class Lounge extends Phaser.Scene {
         //what i need is to log student id, skill id/name, correctness, question ID [[]]
         if (isCorrect) {
 
-            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 1, "Algebra");
+            //this.recordResponse("6zkEsmR", this.currentQuestionIndex, 1, "Algebra");
+            let sessionUser = sessionStorage.getItem("username");
+            this.recordResponse(sessionUser, this.currentQuestionIndex, 1, "Algebra");
             console.log("saved correct response");
 
             //call the BKT API new & update the knowledge state
@@ -678,7 +680,9 @@ class Lounge extends Phaser.Scene {
             this.lastSolvedId = this.currentInteractable.properties['id'];
         }
         else{
-            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 0, "Algebra");
+            let sessionUser = sessionStorage.getItem("username");
+            //this.recordResponse("6zkEsmR", this.currentQuestionIndex, 0, "Algebra");
+            this.recordResponse(sessionUser, this.currentQuestionIndex, 0, "Algebra");
             console.log("saved wrong response");
             //call the BKT API new & update the knowledge state
             this.getMastery(this.knowledge_state, 0, 'easy', 0.8);

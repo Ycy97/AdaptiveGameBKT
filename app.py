@@ -81,13 +81,13 @@ def get_probabilityandstatistics_questions():
     return jsonify(questions)
 
 #API to call pyBKT
-@app.route('/getMastery')
-def getSkilllMasteries():
-    tableName = "recommendation_engine.ct_cy"
-    #user_id get a fake one as you only have one user
-    user_id = "6zkEsmR"
-    skillMastery= BKT(tableName, user_id)
-    return jsonify(skillMastery)
+# @app.route('/getMastery')
+# def getSkilllMasteries():
+#     tableName = "recommendation_engine.ct_cy"
+#     #user_id get a fake one as you only have one user
+#     user_id = "6zkEsmR"
+#     skillMastery= BKT(tableName, user_id)
+#     return jsonify(skillMastery)
 
 
 #API to call bkt_yt for ASG, call made per questions answered
