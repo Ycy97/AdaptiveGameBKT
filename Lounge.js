@@ -15,6 +15,8 @@ class Lounge extends Phaser.Scene {
         this.passcodeNumbers = []; // Array to store passcode numbers
         this.hudText = null; // HUD text object
         this.timerText = null;
+        this.lifePointsText = null;
+        this.lifePointsValue = 5;
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
         this.knowledge_state = 0.1;
@@ -234,6 +236,16 @@ class Lounge extends Phaser.Scene {
             fontSize: '16px',
             fill: '#ffffff'
         }).setScrollFactor(1); // Keep the timer static on the screen
+
+        //add life points
+        let lifePointsPadding = 20; // Padding between timer and life points
+        let lifepointsX = timerX - this.timerText.width - lifePointsPadding; // Position it beside the timer
+
+        // Initialize the life points text
+        this.lifePointsText = this.add.text(lifepointsX, timerY, 'Lives: ' + this.lifePointsValue, {
+            fontSize: '16px',
+            fill: '#ffffff'
+        }).setScrollFactor(1); // Keep the life points static on the screen
 
         // Now create the welcome message
         this.createWelcomeMessage();
@@ -479,7 +491,7 @@ class Lounge extends Phaser.Scene {
             window.location.reload()
         });
     }
-    
+  
     async fetchQuestions() {
         try {
             const response = await fetch('http://127.0.0.1:5000/algebra');
@@ -687,6 +699,30 @@ class Lounge extends Phaser.Scene {
             //call the BKT API new & update the knowledge state
             this.getMastery(this.knowledge_state, 0, 'easy', 0.8);
             console.log("Knowledge state updated : ", this.knowledge_state)
+
+            //decrease lifepoints value
+            // Decrease life points value
+            console.log("LifePoints value before: ", this.lifePointsValue);
+            let updateLife = parseInt(this.lifePointsValue, 10) - 1; // Subtract 1 from the current life points
+            console.log("updateLife value before: ", updateLife);
+
+            // Update the life points text
+            this.lifePointsText.setText('Lives: ' + updateLife);
+
+            //if life reaches 0, losing screen etc
+            if (updateLife < 1){
+                this.showPopupMessage('No more lives!\n You will be redirected to the main menu screen in 5 seconds', 5000);
+                // When the countdown ends, the game will reload in 10 seconds
+                this.time.delayedCall(5000, () => {
+                    window.location.href = "mainMenu.html";
+                });
+            }
+
+            // Update the life points value
+            this.lifePointsValue = updateLife.toString(); // Convert it back to string for consistency
+
+            
+
         }
         
         // Update the question text to show the result and hint if applicable
