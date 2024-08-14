@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-image: url('assets/magicSchool.png'); /* Add the background image */
+            background-size: contain; /* Adjust size to contain the image */
+            background-position: center; /* Center the background image */
+            background-repeat: no-repeat; /* Prevent the image from repeating */
+            background-color: #f0f0f0; /* Fallback background color */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background for better readability */
+            padding: 20px;
+            border-radius: 10px; /* Rounded corners */
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px; /* Space between buttons */
+        }
+        button {
+            width: 200px; /* Set a fixed width for both buttons */
+            height: 60px; /* Set a fixed height for both buttons */
+            font-size: 20px;
+            padding: 0; /* Remove padding since we are using fixed width and height */
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script>
+       fetch('http://127.0.0.1:5000/getSession', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Process data
+            const userSession = data.username;
+            if (userSession) {
+                document.getElementById('greeting').textContent = `Welcome ${userSession} to Math Mystery, an Adaptive Math Escape Room Game!`;
+            }
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 id="greeting">Welcome to Math Mystery, an Adaptive Math Escape Room Game!</h1>
+        <div class="button-container">
+            <a href="game.html">
+                <button id="play-button">Play Game</button>
+            </a>
+            <a href="profile.html">
+                <button id="profile-button">Profile</button>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

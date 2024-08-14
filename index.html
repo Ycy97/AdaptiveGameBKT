@@ -23,7 +23,6 @@
         <input type="password" id="password" class="form-control" placeholder="Password" required>
         <a class="btn btn-lg btn-primary btn-block" onClick="signIn()">Sign in</a>
         <a href="signup.html">Don't have an account? Sign up here.</a>
-        <a href="game.html">TestCY</a>
     </form>
 
     <script>
@@ -49,7 +48,8 @@
                 headers :{
                    'Content-Type': 'application/json' 
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                credentials: 'include'
             })
             .then(response => {
                 if (!response.ok) {
@@ -60,7 +60,7 @@
             .then(data => {
                 alert(data.message);
                 if (data.message === 'Login successful!') {
-                    window.location.href = 'game.html';
+                    window.location.href = 'mainMenu.html';
                 }
             })
             .catch(error => {
