@@ -8,14 +8,7 @@ from bkt_model2 import update_knowledge
 
 app = Flask(__name__)
 app.secret_key = 'cy_secretKey'
-# app.config.update(
-#     SESSION_COOKIE_SECURE=False,  # Set to True if using HTTPS
-#     SESSION_COOKIE_HTTPONLY=True,
-#     SESSION_COOKIE_SAMESITE='None',  # Use 'Strict' if stricter rules are needed
-# )
-# app.config["SESSION_PERMANENT"] = False
-# app.config["SESSION_TYPE"] = "filesystem"
-# Session(app)
+
 # Allow CORS for all domains on all routes
 CORS(app, resources={r"/*": {"origins": "*", "supports_credentials": True}})
 bcrypt = Bcrypt(app)
@@ -44,16 +37,35 @@ print("Ready to connect to database")
 def index():
     return render_template('index.html')
 
-@app.route('/algebra', methods=['GET'])
-def get_algebra_questions():
-    # Create a new connection using the db_config dictionary
+#API methods to call algebra, numbers, and prob&statistics - need to modify where it selects the difficulty
+@app.route('/algebraEasy', methods=['GET'])
+def get_algebra_questionsEasy():
     conn = mysql.connector.connect(**db_config)
     cur = conn.cursor(dictionary=True) # This ensures you get column names in your result
-    cur.execute("SELECT * FROM algebra")
+    cur.execute("SELECT * FROM algebra WHERE difficulty = 'Easy'")
     questions = cur.fetchall()
     cur.close()
     conn.close()
-    # No need to convert to dict, as cursor(dictionary=True) does that
+    return jsonify(questions)
+
+@app.route('/algebraMedium', methods=['GET'])
+def get_algebra_questionsMedium():
+    conn = mysql.connector.connect(**db_config)
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT * FROM algebra where difficulty = 'Medium'")
+    questions = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(questions)
+
+@app.route('/algebraHard', methods=['GET'])
+def get_algebra_questionsHard():
+    conn = mysql.connector.connect(**db_config)
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT * FROM algebra WHERE difficulty = 'Hard'")
+    questions = cur.fetchall()
+    cur.close()
+    conn.close()
     return jsonify(questions)
 
 @app.route('/numbers', methods=['GET'])
@@ -79,16 +91,6 @@ def get_probabilityandstatistics_questions():
     conn.close()
     # No need to convert to dict, as cursor(dictionary=True) does that
     return jsonify(questions)
-
-#API to call pyBKT
-# @app.route('/getMastery')
-# def getSkilllMasteries():
-#     tableName = "recommendation_engine.ct_cy"
-#     #user_id get a fake one as you only have one user
-#     user_id = "6zkEsmR"
-#     skillMastery= BKT(tableName, user_id)
-#     return jsonify(skillMastery)
-
 
 #API to call bkt_yt for ASG, call made per questions answered
 @app.route('/getStudentMastery', methods=['POST'])
@@ -183,14 +185,6 @@ def gameSignup():
 def logout():
     #session.pop('username', None)
     return jsonify({'message': 'Logged out successfully'}), 200
-
-#API path to retrieve session data
-# @app.route('/getSession',methods=['GET'])
-# def get_session():
-#     if 'username' in session:
-#         return jsonify({'username': session['username']})
-#     else:
-#         return jsonify({'message': 'No session data'}), 401
 
 
 if __name__ == '__main__':
