@@ -27,7 +27,6 @@ class Lounge extends Phaser.Scene {
             3: 'Grab a pool stick and lets play pool!',
             4: 'Lets sit on the couch and watch some TV',
             5: 'That was fun! Lets go to the next room!',
-            // ... more hints
           };
     }
 
@@ -48,6 +47,9 @@ class Lounge extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 50,
         });
+
+        //load audio
+        this.load.audio('clockLoop','assets/audio/clock_loop.wav');
 
     }
 
@@ -129,6 +131,10 @@ class Lounge extends Phaser.Scene {
             repeat: -1,
             frames: this.anims.generateFrameNumbers('player', { start: 0, end: 5 }),
         });
+
+        //audio stuff
+        this.clockLoop = this.sound.add('clockLoop', { loop: true});
+        this.clockLoop.play({ rate: 1.5, volume: 0.5})
 
         // define keys
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
@@ -285,6 +291,8 @@ class Lounge extends Phaser.Scene {
 
         // Check if 'M' is pressed and switch to Classroom scene
         if (Phaser.Input.Keyboard.JustDown(keyM)) {
+            //test stop audio 
+            this.clockLoop.stop();
             this.scene.start('LoungeMedium');
         }
 
@@ -791,8 +799,9 @@ class Lounge extends Phaser.Scene {
                 document.body.removeChild(element); // Remove the input field from the document
     
                 if (userPasscode === this.passcodeNumbers.join('')) {
+                    this.clockLoop.stop();
                     // Correct passcode
-                    this.scene.start('Classroom');
+                    this.scene.start('LoungeMedium');
                 } else {
                     // Incorrect passcode
                     this.showPopupMessage('Incorrect passcode.', 3000);

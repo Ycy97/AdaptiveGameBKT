@@ -47,6 +47,8 @@ class Classroom extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 50,
         });
+
+        this.load.audio('clockLoop','assets/audio/clock_loop.wav');
     }
 
 // Create function to create the map
@@ -135,6 +137,9 @@ class Classroom extends Phaser.Scene {
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+
+        this.clockLoop = this.sound.add('clockLoop', { loop: true});
+        this.clockLoop.play({ rate: 1.5, volume: 0.5})
 
         // Overlap check for interactable objects in furnitureLayer
         this.physics.add.overlap(this.player, furnitureLayer, (player, tile) => {
@@ -272,6 +277,7 @@ class Classroom extends Phaser.Scene {
 
         // Check if 'M' is pressed and switch to Classroom scene
         if (Phaser.Input.Keyboard.JustDown(keyM)) {
+            this.clockLoop.stop();
             this.scene.start('ClassroomMedium');
         }
 
@@ -753,6 +759,7 @@ class Classroom extends Phaser.Scene {
     
                 if (userPasscode === this.passcodeNumbers.join('')) {
                     // Correct passcode
+                    this.clockLoop.stop();
                     this.scene.start('ClassroomMedium');
                 } else {
                     // Incorrect passcode

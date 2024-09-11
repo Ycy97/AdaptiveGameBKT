@@ -43,9 +43,11 @@ class BathroomHard extends Phaser.Scene{
 
         this.load.spritesheet('player', 'assets/player.png', {
 
-                frameWidth: 32,
-                frameHeight: 50,
-            });
+            frameWidth: 32,
+            frameHeight: 50,
+        });
+        
+        this.load.audio('clockLoop','assets/audio/clock_loop.wav');
     }
 
     create(){
@@ -121,6 +123,9 @@ class BathroomHard extends Phaser.Scene{
             repeat: -1,
             frames: this.anims.generateFrameNumbers('player', { start: 0, end: 5 }),
         });
+
+        this.clockLoop = this.sound.add('clockLoop', { loop: true});
+        this.clockLoop.play({ rate: 1.5, volume: 0.5})
 
         // define keys
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
@@ -264,6 +269,8 @@ class BathroomHard extends Phaser.Scene{
 
         // Check if 'M' is pressed and switch to Classroom scene
         if (Phaser.Input.Keyboard.JustDown(keyM)) {
+            this.clockLoop.stop();
+            //need to modify to end game scene
             this.scene.start('Lounge');
         }
 
@@ -744,6 +751,7 @@ class BathroomHard extends Phaser.Scene{
     
                 if (userPasscode === this.passcodeNumbers.join('')) {
                     // Correct passcode
+                    this.clockLoop.stop();
                     this.scene.start('Lounge');
                 } else {
                     // Incorrect passcode
