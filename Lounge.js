@@ -187,6 +187,10 @@ class Lounge extends Phaser.Scene {
             if (this.questionActive) {
                 return;
             }
+
+            if (this.npcDialogActive) {
+                return;
+            }
         
             // Check if near the door and if all previous puzzles are solved
             if (this.nearDoor && this.lastSolvedId === 5 && this.passcodeNumbers.length === 5) {
@@ -353,7 +357,7 @@ class Lounge extends Phaser.Scene {
             .setScrollFactor(0);
     
         // Create the NPC dialog text
-        const dialog = this.add.text(cameraCenterX, cameraCenterY, npcDialogText, {
+        const dialog = this.add.text(cameraCenterX, cameraCenterY + 10, npcDialogText, {
             fontSize: '16px',
             fill: '#ffffff',
             align: 'center',
@@ -361,7 +365,7 @@ class Lounge extends Phaser.Scene {
         }).setOrigin(0.5).setScrollFactor(0);
     
         // Create the tips link text
-        const tipsLink = this.add.text(cameraCenterX, cameraCenterY + 40, tipsLinkText, {
+        const tipsLink = this.add.text(cameraCenterX, cameraCenterY + 50, tipsLinkText, {
             fontSize: '16px',
             fill: '#00ffff',
             fontStyle: 'underline'
@@ -370,7 +374,7 @@ class Lounge extends Phaser.Scene {
           .setScrollFactor(0);
     
         // Create the video link text
-        const videoLink = this.add.text(cameraCenterX, cameraCenterY + 80, videoLinkText, {
+        const videoLink = this.add.text(cameraCenterX, cameraCenterY + 90, videoLinkText, {
             fontSize: '16px',
             fill: '#00ffff',
             fontStyle: 'underline'
@@ -404,7 +408,7 @@ class Lounge extends Phaser.Scene {
             this.isInteractable = false;
             this.questionActive = false; // Make sure this is reset when NPC dialog is closed
             this.npcDialogActive = false;
-            console.log("NPC dialog status : " ,this.npcDialogActive);
+            //console.log("NPC dialog status : " ,this.npcDialogActive);
         });
     
         // Make everything visible

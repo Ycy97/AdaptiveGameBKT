@@ -93716,7 +93716,7 @@
                         {
                          "name":"npc",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
