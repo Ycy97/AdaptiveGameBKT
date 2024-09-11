@@ -7,6 +7,7 @@ class Lounge extends Phaser.Scene {
         this.dialogText = null; // Placeholder for the dialog text object
         this.questions = []; // Store fetched questions
         this.npcDialogBox = null; // Separate dialog box for NPC interactions
+        this.npcDialogActive = false;
         this.dialogWidth = null;  
         this.dialogHeight = null; 
         this.questionActive = false; // Flag to check if a question is currently active
@@ -178,6 +179,7 @@ class Lounge extends Phaser.Scene {
             }
         }, null, this);
 
+       
         keyE.on('down', () => {
             if (!this.canInteract) return; // Exit if interaction is on cooldown
 
@@ -193,7 +195,7 @@ class Lounge extends Phaser.Scene {
             }
         
             // Adding additional spatial check for NPC proximity
-            if (this.nearNPC) {
+            if (this.nearNPC && this.npcDialogActive==false) {
                 console.log('NPC interaction');
                 this.showNPCDialog();
             } else {
@@ -329,8 +331,11 @@ class Lounge extends Phaser.Scene {
 
 
     showNPCDialog() {
-        const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
-        const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
+        this.npcDialogActive = true;
+        // const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
+        // const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
+        const cameraCenterX = window.innerWidth / 2;
+        const cameraCenterY = window.innerHeight / 2;
     
         // Define the text for the NPC dialog and links
         const npcDialogText = "Here's a hint to help you with algebra.\n Check out these resources:";
@@ -338,17 +343,17 @@ class Lounge extends Phaser.Scene {
         const videoLinkText = "Watch Algebra Videos";
     
         // Set the width and height of the dialog box
-        const dialogWidth = this.cameras.main.width * 0.8 / this.cameras.main.zoom;
-        const dialogHeight = 200; // Set an appropriate height to contain all the text
+        const dialogWidth = this.cameras.main.width;
+        const dialogHeight = this.cameras.main.height;
     
         // Create the semi-transparent dialog box
-        this.npcDialogBox = this.add.rectangle(cameraCenterX + 350, cameraCenterY + 80, dialogWidth, dialogHeight, 0x000000, 0.8)
+        this.npcDialogBox = this.add.rectangle(cameraCenterX, cameraCenterY , dialogWidth, dialogHeight, 0x000000, 0.8)
             .setOrigin(0.5)
             .setInteractive()
             .setScrollFactor(0);
     
         // Create the NPC dialog text
-        const dialog = this.add.text(cameraCenterX + 350, cameraCenterY + 20, npcDialogText, {
+        const dialog = this.add.text(cameraCenterX, cameraCenterY, npcDialogText, {
             fontSize: '16px',
             fill: '#ffffff',
             align: 'center',
@@ -356,7 +361,7 @@ class Lounge extends Phaser.Scene {
         }).setOrigin(0.5).setScrollFactor(0);
     
         // Create the tips link text
-        const tipsLink = this.add.text(cameraCenterX + 350, cameraCenterY + 70, tipsLinkText, {
+        const tipsLink = this.add.text(cameraCenterX, cameraCenterY + 40, tipsLinkText, {
             fontSize: '16px',
             fill: '#00ffff',
             fontStyle: 'underline'
@@ -365,7 +370,7 @@ class Lounge extends Phaser.Scene {
           .setScrollFactor(0);
     
         // Create the video link text
-        const videoLink = this.add.text(cameraCenterX + 350, cameraCenterY + 100, videoLinkText, {
+        const videoLink = this.add.text(cameraCenterX, cameraCenterY + 80, videoLinkText, {
             fontSize: '16px',
             fill: '#00ffff',
             fontStyle: 'underline'
@@ -378,7 +383,7 @@ class Lounge extends Phaser.Scene {
         videoLink.on('pointerdown', () => window.open('https://www.youtube.com/results?search_query=algebra+tutorials', '_blank'));
     
         // Create the close button
-        const closeButton = this.add.text(cameraCenterX + 350, cameraCenterY + 150, 'Close', {
+        const closeButton = this.add.text(cameraCenterX, cameraCenterY + 120, 'Close', {
             fontSize: '16px',
             fill: '#ffffff',
             backgroundColor: '#666',
@@ -398,6 +403,8 @@ class Lounge extends Phaser.Scene {
             this.nearNPC = false;
             this.isInteractable = false;
             this.questionActive = false; // Make sure this is reset when NPC dialog is closed
+            this.npcDialogActive = false;
+            console.log("NPC dialog status : " ,this.npcDialogActive);
         });
     
         // Make everything visible
@@ -406,6 +413,7 @@ class Lounge extends Phaser.Scene {
         tipsLink.setVisible(true);
         videoLink.setVisible(true);
         closeButton.setVisible(true);
+    
     }
 
 

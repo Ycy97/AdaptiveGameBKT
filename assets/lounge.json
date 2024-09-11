@@ -93709,6 +93709,11 @@
                  "id":3,
                  "properties":[
                         {
+                         "name":"collision",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"npc",
                          "type":"bool",
                          "value":true
