@@ -13,7 +13,6 @@ app.secret_key = 'cy_secretKey'
 CORS(app, resources={r"/*": {"origins": "*", "supports_credentials": True}})
 bcrypt = Bcrypt(app)
 
-
 # MYSQL database connection configuration parameters
 db_config = {
     'host': "localhost",
@@ -68,28 +67,70 @@ def get_algebra_questionsHard():
     conn.close()
     return jsonify(questions)
 
-@app.route('/numbers', methods=['GET'])
-def get_numbers_questions():
+@app.route('/numbersEasy', methods=['GET'])
+def get_numbers_questionsEasy():
     # Create a new connection using the db_config dictionary
     conn = mysql.connector.connect(**db_config)
     cur = conn.cursor(dictionary=True) # This ensures you get column names in your result
-    cur.execute("SELECT * FROM numbers")
+    cur.execute("SELECT * FROM numbers WHERE difficulty = 'Easy'")
     questions = cur.fetchall()
     cur.close()
     conn.close()
     # No need to convert to dict, as cursor(dictionary=True) does that
     return jsonify(questions)
 
-@app.route('/probabilityandstatistics', methods=['GET'])
-def get_probabilityandstatistics_questions():
+@app.route('/numbersMedium', methods=['GET'])
+def get_numbers_questionsMedium():
     # Create a new connection using the db_config dictionary
     conn = mysql.connector.connect(**db_config)
     cur = conn.cursor(dictionary=True) # This ensures you get column names in your result
-    cur.execute("SELECT * FROM probabilityandstatistics")
+    cur.execute("SELECT * FROM numbers WHERE difficulty = 'Medium'")
     questions = cur.fetchall()
     cur.close()
     conn.close()
     # No need to convert to dict, as cursor(dictionary=True) does that
+    return jsonify(questions)
+
+@app.route('/numbersHard', methods=['GET'])
+def get_numbers_questionsHard():
+    # Create a new connection using the db_config dictionary
+    conn = mysql.connector.connect(**db_config)
+    cur = conn.cursor(dictionary=True) # This ensures you get column names in your result
+    cur.execute("SELECT * FROM numbers WHERE difficulty = 'Hard'")
+    questions = cur.fetchall()
+    cur.close()
+    conn.close()
+    # No need to convert to dict, as cursor(dictionary=True) does that
+    return jsonify(questions)
+
+@app.route('/probabilityandstatisticsEasy', methods=['GET'])
+def get_probabilityandstatistics_questionsEasy():
+    conn = mysql.connector.connect(**db_config)
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT * FROM probabilityandstatistics WHERE difficulty = 'Easy'")
+    questions = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(questions)
+
+@app.route('/probabilityandstatisticsMedium', methods=['GET'])
+def get_probabilityandstatistics_questionsMedium():
+    conn = mysql.connector.connect(**db_config)
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT * FROM probabilityandstatistics WHERE difficulty = 'Medium'")
+    questions = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(questions)
+
+@app.route('/probabilityandstatisticsHard', methods=['GET'])
+def get_probabilityandstatistics_questionsHard():
+    conn = mysql.connector.connect(**db_config)
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT * FROM probabilityandstatistics WHERE difficulty = 'Hard'")
+    questions = cur.fetchall()
+    cur.close()
+    conn.close()
     return jsonify(questions)
 
 #API to call bkt_yt for ASG, call made per questions answered
@@ -106,7 +147,6 @@ def getStudentMasteries():
     }
 
     return jsonify(obtainedMastery)
-
 
 #API to save user question-answer response
 @app.route('/save_response', methods=['POST'])
@@ -185,7 +225,6 @@ def gameSignup():
 def logout():
     #session.pop('username', None)
     return jsonify({'message': 'Logged out successfully'}), 200
-
 
 if __name__ == '__main__':
     app.run(debug=True)
