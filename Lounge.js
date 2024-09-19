@@ -3,6 +3,7 @@ class Lounge extends Phaser.Scene {
     constructor() {
         super('Lounge')
         this.isInteractable = false; // Add a flag to check for interactable state
+        this.nearNPC = false;
         this.canInteract = true; // Flag to control interaction cooldown
         this.dialogText = null; // Placeholder for the dialog text object
         this.questions = []; // Store fetched questions
@@ -146,10 +147,15 @@ class Lounge extends Phaser.Scene {
         keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
 
         // Overlap check for interactable objects in furnitureLayer
+        //NPC is at furniture layer
         this.physics.add.overlap(this.player, furnitureLayer, (player, tile) => {
             if (tile.properties.interactable) {
                 this.isInteractable = true;
                 this.currentInteractable = tile;
+            }
+            else if(tile.properties.npc){
+                this.nearNPC = true;
+                this.NPCTile = tile;
             }
         }, null, this);
 
@@ -169,17 +175,7 @@ class Lounge extends Phaser.Scene {
                 this.doorTile = tile;
             }
         }, null, this);
-
-        // Create an overlap with the NPC
-        this.physics.add.overlap(this.player, furnitureLayer, (player, tile) => {
-            if (tile.properties.npc) {
-                //console.log('Player is NPC');
-                this.nearNPC = true;
-                this.NPCTile = tile;
-            }
-        }, null, this);
-
-       
+  
         keyE.on('down', () => {
             if (!this.canInteract) return; // Exit if interaction is on cooldown
 
@@ -202,6 +198,7 @@ class Lounge extends Phaser.Scene {
             if (this.nearNPC && this.npcDialogActive==false) {
                 console.log('NPC interaction');
                 this.showNPCDialog();
+                return;
             } else {
                 this.nearNPC = false; // Ensure nearNPC is reset if not in proximity
             }
@@ -302,10 +299,14 @@ class Lounge extends Phaser.Scene {
             this.scene.start('LoungeMedium');
         }
 
+        //key to settle npc
         // Reset the interactable state if not overlapping
         if (!this.player.body.touching.none) {
             this.isInteractable = false;
+            this.nearNPC = false; 
+            this.npcDialogActive = false;
             this.dialogText.setVisible(false); // Hide the dialog when not interacting
+            this.npcDialogBox.setVisible(false);
         }
 
         // Use this.dialogWidth and this.dialogHeight here
@@ -336,8 +337,6 @@ class Lounge extends Phaser.Scene {
 
     showNPCDialog() {
         this.npcDialogActive = true;
-        // const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
-        // const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
         const cameraCenterX = window.innerWidth / 2;
         const cameraCenterY = window.innerHeight / 2;
     
@@ -396,6 +395,7 @@ class Lounge extends Phaser.Scene {
           .setInteractive()
           .setScrollFactor(0);
 
+          //come back here
         closeButton.on('pointerdown', () => {
             // Reset all relevant flags and visibility states
             this.npcDialogBox.setVisible(false);
@@ -408,7 +408,9 @@ class Lounge extends Phaser.Scene {
             this.isInteractable = false;
             this.questionActive = false; // Make sure this is reset when NPC dialog is closed
             this.npcDialogActive = false;
-            //console.log("NPC dialog status : " ,this.npcDialogActive);
+            console.log('NPC button close clicked');
+            console.log("NPC dialog status : " ,this.npcDialogActive);
+            return;
         });
     
         // Make everything visible
@@ -613,11 +615,11 @@ class Lounge extends Phaser.Scene {
     showDialogBox() {
 
         // Check if npcDialogBox exists and reset it
-        if (this.npcDialogBox) {
+        if (this.npcDialogBox || this.npcDialogActive) {
             this.npcDialogBox.setVisible(false); // Hide NPC dialog box
             this.npcDialogBox = null; // Reset the property
         }
-
+        this.npcDialogBox = null;
         console.log('Question Opened');
         // Only generate a new question if one isn't already active.
         if (this.currentQuestionIndex === null) {
