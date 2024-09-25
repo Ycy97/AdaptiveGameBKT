@@ -5,6 +5,7 @@ from flask_bcrypt import Bcrypt
 import mysql.connector
 from pyBKT_model import BKT
 from bkt_model2 import update_knowledge
+from openai import OpenAI
 
 app = Flask(__name__)
 app.secret_key = 'cy_secretKey'
@@ -225,6 +226,31 @@ def gameSignup():
 def logout():
     #session.pop('username', None)
     return jsonify({'message': 'Logged out successfully'}), 200
+
+
+#API to call chatGPT completion
+@app.route('/chatgpt', methods=['POST'])
+def chatgpt_prompt():
+    client = OpenAI()
+    messages = []
+    data = request.json
+    prompt = data.get('prompt')
+
+    if not prompt:
+        return jsonify({"error": "No prompt provided"}), 400
+    
+    try:
+        messages.append({"role": "user", "content": prompt})
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages = messages,
+            max_tokens= 100
+        )
+        chat_message = response.choices[0].message.content
+        messages.append({"role": "assistant", "content": chat_message})
+        return jsonify({"response": chat_message})
+    except Exception as e:
+         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
