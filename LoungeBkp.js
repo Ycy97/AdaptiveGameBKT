@@ -3,9 +3,12 @@ class Lounge extends Phaser.Scene {
     constructor() {
         super('Lounge')
         this.isInteractable = false; // Add a flag to check for interactable state
+        this.nearNPC = false;
         this.canInteract = true; // Flag to control interaction cooldown
         this.dialogText = null; // Placeholder for the dialog text object
         this.questions = []; // Store fetched questions
+        this.npcDialogBox = null; // Separate dialog box for NPC interactions
+        this.npcDialogActive = false;
         this.dialogWidth = null;  
         this.dialogHeight = null; 
         this.questionActive = false; // Flag to check if a question is currently active
@@ -19,7 +22,6 @@ class Lounge extends Phaser.Scene {
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
         this.knowledge_state = 0.1;
-        this.hintText = [];
 
         this.hints = {
             1: 'Grab a paddle and lets play ping-pong!',
@@ -37,6 +39,7 @@ class Lounge extends Phaser.Scene {
         this.load.image('basement', 'assets/themes/14_Basement_32x32.png');
         this.load.image('door', 'assets/themes/1_Generic_32x32.png');
         this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
+        this.load.image('npc', 'assets/themes/Premade_Character_32x32_05.png');
 
         // Load the Tiled map JSON file
         this.load.tilemapTiledJSON('loungeMap', 'assets/lounge.json');
@@ -73,11 +76,12 @@ class Lounge extends Phaser.Scene {
         const basementTiles = map.addTilesetImage('Basement', 'basement');
         const doorTiles = map.addTilesetImage('Doors', 'door');
         const roombuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
+        const npcTiles = map.addTilesetImage('NPC', 'npc');
 
         // Create layers from the map data
-        const layoutLayer = map.createLayer('Layout', [basementTiles, doorTiles, roombuilderTiles]);
-        const furnitureLayer = map.createLayer('Furniture', [basementTiles, doorTiles, roombuilderTiles]);
-        const miscLayer = map.createLayer('Misc', [basementTiles, doorTiles, roombuilderTiles]);
+        const layoutLayer = map.createLayer('Layout', [basementTiles, doorTiles, roombuilderTiles, npcTiles]);
+        const furnitureLayer = map.createLayer('Furniture', [basementTiles, doorTiles, roombuilderTiles, npcTiles]);
+        const miscLayer = map.createLayer('Misc', [basementTiles, doorTiles, roombuilderTiles, npcTiles]);
 
         // Set collision for tiles with custom property "collision"
         layoutLayer.setCollisionByProperty({ collision: true });
@@ -85,15 +89,19 @@ class Lounge extends Phaser.Scene {
         miscLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
+        const centerX = this.cameras.main.width / 2;
+        const centerY = this.cameras.main.height / 2;
         const mapWidth = map.widthInPixels;
         const mapHeight = map.heightInPixels;
+        const cameraX = centerX - (mapWidth / 2);
+        const cameraY = centerY - (mapHeight / 2);
         this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
         this.player = this.physics.add.sprite(432, 300, 'player');
 
         // Set camera properties
         this.cameras.main.startFollow(this.player, true); // Make the camera follow the player
-        this.cameras.main.setZoom(2.0); // Zoom in x2
+        this.cameras.main.setZoom(2.2); // Zoom in x2
 
         // Enable collisions between the player and the map layers
         this.physics.add.collider(this.player, layoutLayer);
@@ -131,12 +139,12 @@ class Lounge extends Phaser.Scene {
         this.clockLoop.play({ rate: 1.5, volume: 0.5})
 
         // define keys
-        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
-        //keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+        keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
 
         // Overlap check for interactable objects in furnitureLayer
         //NPC is at furniture layer
@@ -144,6 +152,10 @@ class Lounge extends Phaser.Scene {
             if (tile.properties.interactable) {
                 this.isInteractable = true;
                 this.currentInteractable = tile;
+            }
+            else if(tile.properties.npc){
+                this.nearNPC = true;
+                this.NPCTile = tile;
             }
         }, null, this);
 
@@ -171,11 +183,24 @@ class Lounge extends Phaser.Scene {
             if (this.questionActive) {
                 return;
             }
+
+            if (this.npcDialogActive) {
+                return;
+            }
         
             // Check if near the door and if all previous puzzles are solved
             if (this.nearDoor && this.lastSolvedId === 5 && this.passcodeNumbers.length === 5) {
                 this.askForPasscode();
                 return; // Exit the function after triggering the passcode dialog
+            }
+        
+            // Adding additional spatial check for NPC proximity
+            if (this.nearNPC && this.npcDialogActive==false) {
+                console.log('NPC interaction');
+                this.showNPCDialog();
+                return;
+            } else {
+                this.nearNPC = false; // Ensure nearNPC is reset if not in proximity
             }
 
             // Handle interactions with other objects
@@ -203,60 +228,33 @@ class Lounge extends Phaser.Scene {
         // Call the function to create UI components for the dialog box
         this.createDialogComponents();
 
-        let timerOffsetX = -50;
-        let timerOffsetY = 100;
-        let timerX = this.player.x + timerOffsetX; // 380 pixels from the right edge
-        let timerY = this.player.y - timerOffsetY ; // 155 pixels from the top
+        let hudTextX = 500; // 500 pixels from the right edge
+        let hudTextY = 175; // 175 pixels from the top
+
+        // Create the HUD text at the specified position
+        this.hudText = this.add.text(hudTextX, hudTextY, 'Passcode: ', {
+            fontSize: '16px',
+            fill: '#ffffff'
+        }).setScrollFactor(1).setOrigin(1, 0); // Align text to the top-right
+
+        let timerX = 380; // 380 pixels from the right edge
+        let timerY = 155; // 155 pixels from the top
 
         // Initialize the timer text
         this.timerText = this.add.text(timerX, timerY, 'Time: 10:00', {
             fontSize: '16px',
             fill: '#ffffff'
         }).setScrollFactor(1); // Keep the timer static on the screen
-        this.timerText.setStyle({
-            backgroundColor: '#0008', // Semi-transparent black background
-            padding: { x: 10, y: 5 }
-        });
 
         //add life points
-        let lifepointsX = timerX;
-        let lifepointsY = timerY + 20;
+        let lifePointsPadding = 20; // Padding between timer and life points
+        let lifepointsX = timerX - this.timerText.width - lifePointsPadding; // Position it beside the timer
+
         // Initialize the life points text
-        this.lifePointsText = this.add.text(lifepointsX, lifepointsY, 'Lives: ' + this.lifePointsValue, {
+        this.lifePointsText = this.add.text(lifepointsX, timerY, 'Lives: ' + this.lifePointsValue, {
             fontSize: '16px',
             fill: '#ffffff'
         }).setScrollFactor(1); // Keep the life points static on the screen
-        this.lifePointsText.setStyle({
-            backgroundColor: '#0008', // Semi-transparent black background
-            padding: { x: 10, y: 5 }
-        });
-
-        let hudTextX = timerX; 
-        let hudTextY = lifepointsY + 20; 
-
-        // Create the HUD text at the specified position
-        this.hudText = this.add.text(hudTextX, hudTextY, 'Passcode: ', {
-            fontSize: '16px',
-            fill: '#ffffff'
-        }).setScrollFactor(1);
-
-        this.hudText.setStyle({
-            backgroundColor: '#0008', // Semi-transparent black background
-            padding: { x: 10, y: 5 }
-        });
-
-        
-        //hint button
-        let hintX  = timerX;
-        let hintY = hudTextY + 20;
-        this.hintText = this.add.text(hintX, hintY, 'AI Bot!').setInteractive().setScrollFactor(1);
-        this.hintText.setStyle({
-            backgroundColor: '#666',
-        });
-
-        this.hintText.on('pointerdown', () =>{
-            this.gptDialog();
-        });
 
         // Now create the welcome message
         this.createWelcomeMessage();
@@ -295,37 +293,20 @@ class Lounge extends Phaser.Scene {
         }
 
         // Check if 'M' is pressed and switch to Classroom scene
-        // if (Phaser.Input.Keyboard.JustDown(keyM)) {
-        //     //test stop audio 
-        //     this.clockLoop.stop();
-        //     this.scene.start('LoungeMedium');
-        // }
+        if (Phaser.Input.Keyboard.JustDown(keyM)) {
+            //test stop audio 
+            this.clockLoop.stop();
+            this.scene.start('LoungeMedium');
+        }
 
-        let timerOffsetX = -50;
-        let timerOffsetY = 100;
-        let timerX = this.player.x + timerOffsetX; // 380 pixels from the right edge
-        let timerY = this.player.y - timerOffsetY ; // 155 pixels from the top
-
-        this.timerText.setPosition(timerX, timerY);
-
-        let lifepointsX = timerX;
-        let lifepointsY = timerY + 20;
-        this.lifePointsText.setPosition(lifepointsX,lifepointsY);
-
-        let hudTextX = timerX; 
-        let hudTextY = lifepointsY + 20;
-        this.hudText.setText(`Passcode: ${this.passcodeNumbers.join('')}`).setPosition(hudTextX,hudTextY);
-
-        let hintX  = timerX;
-        let hintY = hudTextY + 20;
-        
-        this.hintText.setPosition(hintX,hintY);
-
-
+        //key to settle npc
         // Reset the interactable state if not overlapping
         if (!this.player.body.touching.none) {
             this.isInteractable = false;
+            this.nearNPC = false; 
+            this.npcDialogActive = false;
             this.dialogText.setVisible(false); // Hide the dialog when not interacting
+            this.npcDialogBox.setVisible(false);
         }
 
         // Use this.dialogWidth and this.dialogHeight here
@@ -348,101 +329,11 @@ class Lounge extends Phaser.Scene {
             button.setPosition(this.dialogBox.x, currentY);
             currentY += button.height + buttonSpacing;
         });
+
+        this.hudText.setText(`Passcode: ${this.passcodeNumbers.join('')}`);
         
     }
 
-    displayGptResponse(gptResponse){
-        //create a dialog component
-        const gptDialogBoxcx = document.createElement('div');
-        gptDialogBoxcx.style.position = 'fixed';
-        gptDialogBoxcx.style.top = '50%';
-        gptDialogBoxcx.style.left = '50%';
-        gptDialogBoxcx.style.transform = 'translate(-50%, -50%)';
-        gptDialogBoxcx.style.width = '300px';
-        gptDialogBoxcx.style.padding = '20px';
-        gptDialogBoxcx.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        gptDialogBoxcx.style.color = '#ffffff';
-        gptDialogBoxcx.style.borderRadius = '10px';
-        gptDialogBoxcx.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
-        gptDialogBoxcx.style.zIndex = '1000'; // Ensure it's above other elements
-        document.body.appendChild(gptDialogBoxcx);
-
-        const closeButton = document.createElement('button');
-        closeButton.innerHTML = '✖'; // Close icon
-        closeButton.style.position = 'absolute';
-        closeButton.style.top = '10px';
-        closeButton.style.right = '10px';
-        closeButton.style.background = 'none';
-        closeButton.style.border = 'none';
-        closeButton.style.color = '#ffffff';
-        closeButton.style.fontSize = '20px';
-        closeButton.style.cursor = 'pointer';
-        gptDialogBoxcx.appendChild(closeButton);
-
-        const gptResponseText = document.createElement('p');
-        gptResponseText.innerText = gptResponse;
-        gptResponseText.style.textAlign = 'center';
-        gptDialogBoxcx.appendChild(gptResponseText);
-
-        closeButton.addEventListener('click', () => {
-            document.body.removeChild(gptDialogBoxcx); // Remove the dialog box
-            this.scene.resume(); // Resume the scene
-        });
-    }
-
-    gptDialog(){
-        this.scene.pause();
-        // Create an HTML input element overlay
-        const element = document.createElement('input');
-        element.type = 'text';
-        element.style.position = 'absolute';
-        element.style.top = '50%'; // Center on screen
-        element.style.left = '50%';
-        element.style.transform = 'translate(-50%, -50%)';
-        element.style.fontSize = '20px'; // Big enough to match your game's style
-    
-        document.body.appendChild(element);
-        element.focus(); // Automatically focus the input field
-    
-        // Handle the input submission
-        element.addEventListener('keydown', event => {
-            if (event.key === 'Enter') {
-                //pass the question as form of prompt to gpt api and get a response back before scene resume
-                let prompt = element.value;
-                const data = {
-                   prompt
-                };
-                document.body.removeChild(element);
-                console.log(JSON.stringify(data));
-                //API to call BKT and get student mastery
-                fetch('http://127.0.0.1:5000/chatgpt', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('ChatGPT response', data);
-                    //access the value obtained
-                    let fetchResponse = data.response;
-                    console.log('fetchedResponse', fetchResponse)
-                    //display the response on the game
-                    this.displayGptResponse(fetchResponse);
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                });
-            }
-        });
-
-    }
 
     showNPCDialog() {
         this.npcDialogActive = true;
@@ -521,7 +412,13 @@ class Lounge extends Phaser.Scene {
             console.log("NPC dialog status : " ,this.npcDialogActive);
             return;
         });
-
+    
+        // Make everything visible
+        this.npcDialogBox.setVisible(true);
+        dialog.setVisible(true);
+        tipsLink.setVisible(true);
+        videoLink.setVisible(true);
+        closeButton.setVisible(true);
     
     }
 
@@ -717,6 +614,12 @@ class Lounge extends Phaser.Scene {
 
     showDialogBox() {
 
+        // Check if npcDialogBox exists and reset it
+        if (this.npcDialogBox || this.npcDialogActive) {
+            this.npcDialogBox.setVisible(false); // Hide NPC dialog box
+            this.npcDialogBox = null; // Reset the property
+        }
+        this.npcDialogBox = null;
         console.log('Question Opened');
         // Only generate a new question if one isn't already active.
         if (this.currentQuestionIndex === null) {
@@ -989,5 +892,7 @@ class Lounge extends Phaser.Scene {
             console.error('There was a problem with the fetch operation:', error);
         });
     }
-   
+
+
+    
 }
