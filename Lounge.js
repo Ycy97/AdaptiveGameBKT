@@ -20,6 +20,7 @@ class Lounge extends Phaser.Scene {
         this.student_responses = [];
         this.knowledge_state = 0.1;
         this.hintText = [];
+        this.hintActive = false;
 
         this.hints = {
             1: 'Grab a paddle and lets play ping-pong!',
@@ -37,12 +38,12 @@ class Lounge extends Phaser.Scene {
         this.load.image('basement', 'assets/themes/14_Basement_32x32.png');
         this.load.image('door', 'assets/themes/1_Generic_32x32.png');
         this.load.image('roombuilder', 'assets/themes/Room_Builder_32x32.png');
+        this.load.image('classroom','assets/themes/5_Classroom_and_library_32x32.png')
 
         // Load the Tiled map JSON file
         this.load.tilemapTiledJSON('loungeMap', 'assets/lounge.json');
 
         this.load.spritesheet('player', 'assets/player.png', {
-
             frameWidth: 32,
             frameHeight: 50,
         });
@@ -73,11 +74,12 @@ class Lounge extends Phaser.Scene {
         const basementTiles = map.addTilesetImage('Basement', 'basement');
         const doorTiles = map.addTilesetImage('Doors', 'door');
         const roombuilderTiles = map.addTilesetImage('RoomBuilder', 'roombuilder');
+        const classroomTiles = map.addTilesetImage('Classroom','classroom');
 
         // Create layers from the map data
-        const layoutLayer = map.createLayer('Layout', [basementTiles, doorTiles, roombuilderTiles]);
-        const furnitureLayer = map.createLayer('Furniture', [basementTiles, doorTiles, roombuilderTiles]);
-        const miscLayer = map.createLayer('Misc', [basementTiles, doorTiles, roombuilderTiles]);
+        const layoutLayer = map.createLayer('Layout', [basementTiles, doorTiles, roombuilderTiles,classroomTiles]);
+        const furnitureLayer = map.createLayer('Furniture', [basementTiles, doorTiles, roombuilderTiles,classroomTiles]);
+        const miscLayer = map.createLayer('Misc', [basementTiles, doorTiles, roombuilderTiles,classroomTiles]);
 
         // Set collision for tiles with custom property "collision"
         layoutLayer.setCollisionByProperty({ collision: true });
@@ -135,11 +137,10 @@ class Lounge extends Phaser.Scene {
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+        keySHIFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
         //keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
 
         // Overlap check for interactable objects in furnitureLayer
-        //NPC is at furniture layer
         this.physics.add.overlap(this.player, furnitureLayer, (player, tile) => {
             if (tile.properties.interactable) {
                 this.isInteractable = true;
@@ -164,7 +165,7 @@ class Lounge extends Phaser.Scene {
             }
         }, null, this);
   
-        keyE.on('down', () => {
+        keySHIFT.on('down', () => {
             if (!this.canInteract) return; // Exit if interaction is on cooldown
 
             // Early exit if a question is currently active
@@ -184,7 +185,13 @@ class Lounge extends Phaser.Scene {
                 if (interactableId <= 5 && interactableId === this.lastSolvedId + 1) {
                     console.log('Interacting with object:', interactableId);
                     this.showDialogBox();
-                } else {
+                } 
+                else if(interactableId === -1){
+                    console.log("GPT hint accessed");
+                    //dialog for GPT prompt and response
+                    this.gptDialog();
+                }
+                else {
                     //this.showPopupMessage('Please solve the previous challenge first.', 3000);
                     console.log('No interactable objects in range')
                 }
@@ -352,19 +359,25 @@ class Lounge extends Phaser.Scene {
     }
 
     displayGptResponse(gptResponse){
+        console.log("Entered prompt area");
         //create a dialog component
         const gptDialogBoxcx = document.createElement('div');
         gptDialogBoxcx.style.position = 'fixed';
         gptDialogBoxcx.style.top = '50%';
         gptDialogBoxcx.style.left = '50%';
         gptDialogBoxcx.style.transform = 'translate(-50%, -50%)';
-        gptDialogBoxcx.style.width = '300px';
+        gptDialogBoxcx.style.width = '1000px';
+        gptDialogBoxcx.style.height = '300px';
         gptDialogBoxcx.style.padding = '20px';
         gptDialogBoxcx.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
         gptDialogBoxcx.style.color = '#ffffff';
         gptDialogBoxcx.style.borderRadius = '10px';
         gptDialogBoxcx.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
         gptDialogBoxcx.style.zIndex = '1000'; // Ensure it's above other elements
+        gptDialogBoxcx.style.display = 'flex';
+        gptDialogBoxcx.style.flexDirection = 'column'; // Stack elements vertically
+        gptDialogBoxcx.style.justifyContent = 'center'; // Center vertically
+        gptDialogBoxcx.style.alignItems = 'center'; // Center horizontally
         document.body.appendChild(gptDialogBoxcx);
 
         const closeButton = document.createElement('button');
@@ -382,6 +395,7 @@ class Lounge extends Phaser.Scene {
         const gptResponseText = document.createElement('p');
         gptResponseText.innerText = gptResponse;
         gptResponseText.style.textAlign = 'center';
+        gptResponseText.style.fontSize = '24px';
         gptDialogBoxcx.appendChild(gptResponseText);
 
         closeButton.addEventListener('click', () => {
@@ -392,28 +406,47 @@ class Lounge extends Phaser.Scene {
 
     gptDialog(){
         this.scene.pause();
+        //Create modal view background
+        const modalBackground = document.createElement('div');
+        modalBackground.style.position = 'fixed';
+        modalBackground.style.top = '0';
+        modalBackground.style.left = '0';
+        modalBackground.style.width = '100%';
+        modalBackground.style.height = '100%';
+        modalBackground.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Grey background
+        modalBackground.style.display = 'flex';
+        modalBackground.style.justifyContent = 'center';
+        modalBackground.style.alignItems = 'center';
+        modalBackground.style.zIndex = '999'; // Ensure it's on top
+
+
         // Create an HTML input element overlay
-        const element = document.createElement('input');
-        element.type = 'text';
-        element.style.position = 'absolute';
-        element.style.top = '50%'; // Center on screen
-        element.style.left = '50%';
-        element.style.transform = 'translate(-50%, -50%)';
-        element.style.fontSize = '20px'; // Big enough to match your game's style
+        const inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.style.position = 'absolute';
+        inputElement.style.top = '50%'; // Center on screen
+        inputElement.style.left = '50%';
+        inputElement.style.transform = 'translate(-50%, -50%)';
+        inputElement.style.fontSize = '30px'; // Big enough to match your game's style
+        inputElement.style.width = '1200px'; // Set a specific width
+        inputElement.style.height = '100px'; // Set a specific height
+        inputElement.placeholder = "Enter your question prompt to access the hints";
     
-        document.body.appendChild(element);
-        element.focus(); // Automatically focus the input field
-    
+        document.body.appendChild(modalBackground);
+        modalBackground.appendChild(inputElement);
+        inputElement.focus(); // Automatically focus the input field
+
+
         // Handle the input submission
-        element.addEventListener('keydown', event => {
+        inputElement.addEventListener('keydown', event => {
             if (event.key === 'Enter') {
                 //pass the question as form of prompt to gpt api and get a response back before scene resume
-                let prompt = element.value;
+                let prompt = inputElement.value;
                 const data = {
                    prompt
                 };
-                document.body.removeChild(element);
                 console.log(JSON.stringify(data));
+                document.body.removeChild(modalBackground);
                 //API to call BKT and get student mastery
                 fetch('http://127.0.0.1:5000/chatgpt', {
                     method: 'POST',
@@ -443,88 +476,6 @@ class Lounge extends Phaser.Scene {
         });
 
     }
-
-    showNPCDialog() {
-        this.npcDialogActive = true;
-        const cameraCenterX = window.innerWidth / 2;
-        const cameraCenterY = window.innerHeight / 2;
-    
-        // Define the text for the NPC dialog and links
-        const npcDialogText = "Here's a hint to help you with algebra.\n Check out these resources:";
-        const tipsLinkText = "Learn Algebra Tips";
-        const videoLinkText = "Watch Algebra Videos";
-    
-        // Set the width and height of the dialog box
-        const dialogWidth = this.cameras.main.width;
-        const dialogHeight = this.cameras.main.height;
-    
-        // Create the semi-transparent dialog box
-        this.npcDialogBox = this.add.rectangle(cameraCenterX, cameraCenterY , dialogWidth, dialogHeight, 0x000000, 0.8)
-            .setOrigin(0.5)
-            .setInteractive()
-            .setScrollFactor(0);
-    
-        // Create the NPC dialog text
-        const dialog = this.add.text(cameraCenterX, cameraCenterY + 10, npcDialogText, {
-            fontSize: '16px',
-            fill: '#ffffff',
-            align: 'center',
-            wordWrap: { width: dialogWidth - 40 }
-        }).setOrigin(0.5).setScrollFactor(0);
-    
-        // Create the tips link text
-        const tipsLink = this.add.text(cameraCenterX, cameraCenterY + 50, tipsLinkText, {
-            fontSize: '16px',
-            fill: '#00ffff',
-            fontStyle: 'underline'
-        }).setOrigin(0.5)
-          .setInteractive()
-          .setScrollFactor(0);
-    
-        // Create the video link text
-        const videoLink = this.add.text(cameraCenterX, cameraCenterY + 90, videoLinkText, {
-            fontSize: '16px',
-            fill: '#00ffff',
-            fontStyle: 'underline'
-        }).setOrigin(0.5)
-          .setInteractive()
-          .setScrollFactor(0);
-    
-        // Interactive links callbacks
-        tipsLink.on('pointerdown', () => window.open('https://www.khanacademy.org/math/algebra', '_blank'));
-        videoLink.on('pointerdown', () => window.open('https://www.youtube.com/results?search_query=algebra+tutorials', '_blank'));
-    
-        // Create the close button
-        const closeButton = this.add.text(cameraCenterX, cameraCenterY + 120, 'Close', {
-            fontSize: '16px',
-            fill: '#ffffff',
-            backgroundColor: '#666',
-            padding: { x: 10, y: 5 }
-        }).setOrigin(0.5)
-          .setInteractive()
-          .setScrollFactor(0);
-
-          //come back here
-        closeButton.on('pointerdown', () => {
-            // Reset all relevant flags and visibility states
-            this.npcDialogBox.setVisible(false);
-            dialog.setVisible(false);
-            tipsLink.setVisible(false);
-            videoLink.setVisible(false);
-            closeButton.setVisible(false);
-        
-            this.nearNPC = false;
-            this.isInteractable = false;
-            this.questionActive = false; // Make sure this is reset when NPC dialog is closed
-            this.npcDialogActive = false;
-            console.log('NPC button close clicked');
-            console.log("NPC dialog status : " ,this.npcDialogActive);
-            return;
-        });
-
-    
-    }
-
 
     createWelcomeMessage() {
         // Calculate the center of the camera view
@@ -576,8 +527,6 @@ class Lounge extends Phaser.Scene {
         closeButton.setVisible(true);
     }
     
-    
-
     updateTimer() {
         this.initialTime -= 1; // Decrease the timer by one second
     
@@ -714,7 +663,6 @@ class Lounge extends Phaser.Scene {
         this.closeButton.setVisible(false);
     }
 
-
     showDialogBox() {
 
         console.log('Question Opened');
@@ -782,7 +730,6 @@ class Lounge extends Phaser.Scene {
         //what i need is to log student id, skill id/name, correctness, question ID [[]]
         if (isCorrect) {
 
-            //this.recordResponse("6zkEsmR", this.currentQuestionIndex, 1, "Algebra");
             let sessionUser = sessionStorage.getItem("username");
             this.recordResponse(sessionUser, this.currentQuestionIndex, 1, "Algebra");
             console.log("saved correct response");
@@ -839,9 +786,6 @@ class Lounge extends Phaser.Scene {
 
             // Update the life points value
             this.lifePointsValue = updateLife.toString(); // Convert it back to string for consistency
-
-            
-
         }
         
         // Update the question text to show the result and hint if applicable
