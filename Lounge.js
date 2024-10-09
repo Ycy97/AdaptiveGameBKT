@@ -139,7 +139,7 @@ class Lounge extends Phaser.Scene {
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keySHIFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
-        //keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+        keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
 
         // Overlap check for interactable objects in furnitureLayer
         this.physics.add.overlap(this.player, furnitureLayer, (player, tile) => {
@@ -312,11 +312,11 @@ class Lounge extends Phaser.Scene {
         }
 
         // Check if 'M' is pressed and switch to Classroom scene
-        // if (Phaser.Input.Keyboard.JustDown(keyM)) {
-        //     //test stop audio 
-        //     this.clockLoop.stop();
-        //     this.scene.start('LoungeMedium');
-        // }
+        if (Phaser.Input.Keyboard.JustDown(keyM)) {
+            //test stop audio 
+            this.clockLoop.stop();
+            this.scene.start('LoungeMedium');
+        }
 
         let timerOffsetX = -50;
         let timerOffsetY = 100;

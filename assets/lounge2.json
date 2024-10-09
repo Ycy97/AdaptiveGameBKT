@@ -35,6 +35,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":30,
          "id":1,
+         "locked":true,
          "name":"Layout",
          "opacity":1,
          "type":"tilelayer",
@@ -45,12 +46,12 @@
         }, 
         {
          "data":[0, 8698, 8699, 9341, 9342, 9343, 0, 8981, 8982, 0, 0, 8981, 8982, 0, 0, 469, 0, 8497, 8498, 8981, 8982, 0, 9181, 9182, 0, 0, 0, 9189, 9190, 0,
-            0, 8714, 8715, 9357, 9358, 9359, 10036, 8997, 8998, 0, 11104, 8997, 8998, 0, 0, 0, 0, 8513, 8514, 8997, 8998, 0, 9197, 9198, 9307, 9307, 9307, 9205, 9206, 0,
-            0, 8730, 8731, 9373, 9374, 9375, 10052, 0, 0, 0, 11160, 0, 0, 8640, 8642, 8642, 8642, 8641, 0, 0, 0, 0, 9213, 9214, 9323, 9323, 9323, 9221, 9222, 0,
+            0, 8714, 8715, 9357, 9358, 9359, 10036, 8997, 8998, 0, 0, 8997, 8998, 0, 0, 0, 0, 8513, 8514, 8997, 8998, 0, 9197, 9198, 9307, 9307, 9307, 9205, 9206, 0,
+            0, 8730, 8731, 9373, 9374, 9375, 10052, 0, 0, 0, 0, 0, 0, 8640, 8642, 8642, 8642, 8641, 0, 0, 0, 0, 9213, 9214, 9323, 9323, 9323, 9221, 9222, 0,
             0, 0, 0, 0, 0, 10065, 10066, 0, 0, 0, 0, 0, 0, 8656, 8658, 8658, 8658, 8657, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 9157, 9158, 10081, 10082, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10292, 10293, 10294, 10295, 0, 0, 0,
-            0, 0, 0, 9173, 9174, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10307, 10308, 10309, 10310, 10311, 10957, 10957, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10323, 10324, 10325, 10326, 10327, 10973, 10973, 0,
+            0, 0, 0, 9157, 9158, 10081, 10082, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13564, 13565, 0, 10292, 10293, 10294, 10295, 0, 0, 0,
+            0, 0, 0, 9173, 9174, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13580, 13581, 10307, 10308, 10309, 10310, 10311, 10957, 10957, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13596, 13597, 10323, 10324, 10325, 10326, 10327, 10973, 10973, 0,
             0, 10624, 10625, 10626, 10523, 10524, 10523, 10524, 0, 9536, 9537, 9538, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10287, 10288, 0, 0, 0, 0,
             0, 10640, 10641, 10642, 10539, 10540, 10539, 10540, 0, 9552, 9553, 9554, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 9747, 9748, 9749, 9750, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10133, 10134, 0, 10133, 10134, 0,
@@ -118,6 +119,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":30,
          "id":4,
+         "locked":true,
          "name":"Misc",
          "opacity":1,
          "type":"tilelayer",
@@ -83936,9 +83938,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -83950,9 +83957,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -84160,9 +84172,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -84174,9 +84191,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -87707,9 +87729,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -87721,9 +87748,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -87931,9 +87963,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -87945,9 +87982,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -88156,9 +88198,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -88170,9 +88217,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -97978,9 +98030,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":6
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -98203,9 +98260,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":6
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -101753,9 +101815,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":8
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -101978,9 +102045,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":8
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -102202,9 +102274,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":8
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -103129,9 +103206,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":3
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -103143,9 +103225,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":3
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -104265,9 +104352,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":7
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -104279,9 +104371,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":7
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -104489,9 +104586,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":7
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -104503,9 +104605,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":7
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -107871,9 +107978,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":5
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -107885,9 +107997,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":5
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -107899,9 +108016,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":5
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -108096,9 +108218,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":5
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -108110,9 +108237,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":5
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -108124,9 +108256,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":5
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -113106,9 +113243,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -113120,9 +113262,14 @@
                          "value":true
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -113330,9 +113477,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -113344,9 +113496,14 @@
                          "value":false
                         }, 
                         {
+                         "name":"id",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"interactable",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -114584,6 +114741,94 @@
                  "properties":[
                         {
                          "name":"npc",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }],
+         "tilewidth":32
+        }, 
+        {
+         "columns":16,
+         "firstgid":13397,
+         "image":"themes\/5_Classroom_and_library_32x32.png",
+         "imageheight":1088,
+         "imagewidth":512,
+         "margin":0,
+         "name":"Classroom",
+         "spacing":0,
+         "tilecount":544,
+         "tileheight":32,
+         "tiles":[
+                {
+                 "id":167,
+                 "properties":[
+                        {
+                         "name":"collision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":168,
+                 "properties":[
+                        {
+                         "name":"collision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":183,
+                 "properties":[
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":184,
+                 "properties":[
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":199,
+                 "properties":[
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":200,
+                 "properties":[
+                        {
+                         "name":"id",
+                         "type":"int",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"interactable",
                          "type":"bool",
                          "value":true
                         }]
