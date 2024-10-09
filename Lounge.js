@@ -376,7 +376,7 @@ class Lounge extends Phaser.Scene {
         gptDialogBoxcx.style.left = '50%';
         gptDialogBoxcx.style.transform = 'translate(-50%, -50%)';
         gptDialogBoxcx.style.width = '1000px';
-        gptDialogBoxcx.style.height = '300px';
+        gptDialogBoxcx.style.height = '600px';
         gptDialogBoxcx.style.padding = '20px';
         gptDialogBoxcx.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
         gptDialogBoxcx.style.color = '#ffffff';
