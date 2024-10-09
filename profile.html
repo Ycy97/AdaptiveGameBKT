@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Analytics Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .card {
+            background-color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar-inner {
+            height: 20px;
+            width: 70%; /* Change this value to represent progress */
+            background-color: #4CAF50;
+        }
+        .chart {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .chart-item {
+            width: 48%;
+            margin-bottom: 20px;
+        }
+        .chart-item canvas {
+            width: 100%;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .chart-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Learning Analytics Dashboard</h1>
+        </div>
+        <div class="card">
+            <h2>Progress Overview</h2>
+            <div class="progress-bar">
+                <div class="progress-bar-inner"></div>
+            </div>
+            <p>70% of the game completed</p>
+        </div>
+        <div class="card">
+            <h2>Skill Mastery</h2>
+            <div class="chart">
+                <div class="chart-item">
+                    <canvas id="chart1"></canvas>
+                </div>
+                <div class="chart-item">
+                    <canvas id="chart2"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Engagement Metrics</h2>
+            <canvas id="engagementChart"></canvas>
+        </div>
+        <div class="card">
+            <h2>Personalized Feedback</h2>
+            <p>Great job on mastering quadratic equations! Consider revisiting probability to strengthen your understanding.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Adaptive Math Escape Room Game</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sample data for charts
+        const ctx1 = document.getElementById('chart1').getContext('2d');
+        const ctx2 = document.getElementById('chart2').getContext('2d');
+        const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+
+        // Skill Mastery Chart 1
+        new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: ['Algebra', 'Geometry', 'Statistics'],
+                datasets: [{
+                    label: 'Skill Mastery',
+                    data: [60, 30, 80],
+                    backgroundColor: ['#4CAF50', '#FF9800', '#F44336'],
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+
+        // Skill Mastery Chart 2
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Quadratic Equations', 'Probability', 'Functions'],
+                datasets: [{
+                    label: 'Skill Mastery',
+                    data: [70, 40, 90],
+                    backgroundColor: ['#2196F3', '#FFC107', '#9C27B0'],
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+
+        // Engagement Chart
+        new Chart(engagementCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Puzzle 1', 'Puzzle 2', 'Puzzle 3', 'Puzzle 4'],
+                datasets: [{
+                    label: 'Time Spent (minutes)',
+                    data: [5, 8, 12, 6],
+                    backgroundColor: '#4CAF50'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
