@@ -21,6 +21,7 @@ class Lounge extends Phaser.Scene {
         this.knowledge_state = 0.1;
         this.hintText = [];
         this.hintActive = false;
+        this.hintRemaining = 3;
 
         this.hints = {
             1: 'Grab a paddle and lets play ping-pong!',
@@ -256,14 +257,23 @@ class Lounge extends Phaser.Scene {
         //hint button
         let hintX  = timerX;
         let hintY = hudTextY + 20;
-        this.hintText = this.add.text(hintX, hintY, 'AI Bot!').setInteractive().setScrollFactor(1);
+        this.hintText = this.add.text(hintX,hintY, 'Hints Remaining:' + this.hintRemaining, {
+            fontSize: '16px',
+            fill: '#ffffff'
+        }).setScrollFactor(1);
         this.hintText.setStyle({
-            backgroundColor: '#666',
+            backgroundColor: '#0008', // Semi-transparent black background
+            padding: { x: 10, y: 5 }
         });
 
-        this.hintText.on('pointerdown', () =>{
-            this.gptDialog();
-        });
+        // this.hintText = this.add.text(hintX, hintY, 'AI Bot!').setInteractive().setScrollFactor(1);
+        // this.hintText.setStyle({
+        //     backgroundColor: '#666',
+        // });
+
+        // this.hintText.on('pointerdown', () =>{
+        //     this.gptDialog();
+        // });
 
         // Now create the welcome message
         this.createWelcomeMessage();
@@ -327,7 +337,6 @@ class Lounge extends Phaser.Scene {
         let hintY = hudTextY + 20;
         
         this.hintText.setPosition(hintX,hintY);
-
 
         // Reset the interactable state if not overlapping
         if (!this.player.body.touching.none) {
@@ -406,6 +415,12 @@ class Lounge extends Phaser.Scene {
 
     gptDialog(){
         this.scene.pause();
+
+        let hintLeft = parseInt(this.hintRemaining, 10);
+        if(hintLeft < 1){
+            this.scene.resume();
+            return;
+        }
         //Create modal view background
         const modalBackground = document.createElement('div');
         modalBackground.style.position = 'fixed';
@@ -447,6 +462,11 @@ class Lounge extends Phaser.Scene {
                 };
                 console.log(JSON.stringify(data));
                 document.body.removeChild(modalBackground);
+                //reduce hint usage
+                let hintLeft = parseInt(this.hintRemaining, 10) - 1; // Subtract 1 from the current life points
+                // Update hint remaining
+                this.hintText.setText('Hints Remaining: ' + hintLeft);
+                this.hintRemaining = hintLeft.toString();
                 //API to call BKT and get student mastery
                 fetch('http://127.0.0.1:5000/chatgpt', {
                     method: 'POST',
@@ -485,8 +505,8 @@ class Lounge extends Phaser.Scene {
         //hardcoded
         // The text of the welcome message
         const welcomeText = "Welcome to the Maths Escape Room!\n\n" +
-            "Use W, A, S, D to move around.\n" +
-            "Use E to interact with objects.\n\n" +
+            "Use the arrow keys to move around.\n" +
+            "Use SHIFT key to interact with objects.\n\n" +
             "Your first clue is: \n" +//+ this.hints[1]; // Use the first hint as an example
             "Lets play some games at the arcade machine."
         
