@@ -15,7 +15,7 @@ class LoungeHard extends Phaser.Scene{
         this.hudText = null; // HUD text object
         this.timerText = null;
         this.lifePointsText = null;
-        this.lifePointsValue = 5;
+        this.lifePointsValue = 105;
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
         this.knowledge_state = 0.75;
@@ -24,11 +24,16 @@ class LoungeHard extends Phaser.Scene{
         this.hintRemaining = 3;
 
         this.hints = {
-            1: 'Grab a paddle and lets play ping-pong!',
-            2: 'Lets get some food from the picnic basket.',
-            3: 'Grab a pool stick and lets play pool!',
-            4: 'Lets sit on the couch and watch some TV',
-            5: 'That was fun! Lets go to the next room!',
+            1: 'Get that red ball',
+            2: 'Checkout the fireplace',
+            3: 'Look at the mirror',
+            4: 'Golden music rings in my ear',
+            5: 'Running indoor',
+            6: 'Someone left a candy cane on the ground',
+            7: 'Play the piano',
+            8: 'Check out the fridge',
+            9: 'Silver key to the last door in the lounge',
+            10: 'That was fun, lets head to the next area!'
           };
     }
 
@@ -172,7 +177,7 @@ class LoungeHard extends Phaser.Scene{
             }
         
             // Check if near the door and if all previous puzzles are solved
-            if (this.nearDoor && this.lastSolvedId === 5 && this.passcodeNumbers.length === 5) {
+            if (this.nearDoor && this.lastSolvedId === 10 && this.passcodeNumbers.length === 10) {
                 this.askForPasscode();
                 return; // Exit the function after triggering the passcode dialog
             }
@@ -180,7 +185,7 @@ class LoungeHard extends Phaser.Scene{
             // Handle interactions with other objects
             if (this.isInteractable) {
                 const interactableId = this.currentInteractable.properties['id'];
-                if (interactableId <= 8 && interactableId === this.lastSolvedId + 1) {
+                if (interactableId <= 10 && interactableId === this.lastSolvedId + 1) {
                     console.log('Interacting with object:', interactableId);
                     this.showDialogBox();
                 }
@@ -818,7 +823,7 @@ class LoungeHard extends Phaser.Scene{
         element.style.left = '50%';
         element.style.transform = 'translate(-50%, -50%)';
         element.style.fontSize = '20px'; // Big enough to match your game's style
-        element.maxLength = 5; // Limit to 5 characters
+        element.maxLength = 10; // Limit to 5 characters
         element.id = 'user-passcode-input';
     
         document.body.appendChild(element);
