@@ -15,7 +15,7 @@ class LoungeMedium extends Phaser.Scene{
         this.hudText = null; // HUD text object
         this.timerText = null;
         this.lifePointsText = null;
-        this.lifePointsValue = 105;
+        this.lifePointsValue = 5;
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
         this.knowledge_state = 0.5;
@@ -134,6 +134,7 @@ class LoungeMedium extends Phaser.Scene{
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keySHIFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+        keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
 
         // Overlap check for interactable objects in furnitureLayer
         this.physics.add.overlap(this.player, furnitureLayer, (player, tile) => {
@@ -282,11 +283,11 @@ class LoungeMedium extends Phaser.Scene{
             this.player.anims.stop();
         }
 
-        // Check if 'M' is pressed and switch to Classroom scene
-        // if (Phaser.Input.Keyboard.JustDown(keyM)) {
-        //     this.clockLoop.stop();
-        //     this.scene.start('LoungeHard');
-        // }
+        //Check if 'M' is pressed and switch to Classroom scene
+        if (Phaser.Input.Keyboard.JustDown(keyM)) {
+            this.clockLoop.stop();
+            this.scene.start('LoungeHard');
+        }
 
         let timerOffsetX = -50;
         let timerOffsetY = 100;
