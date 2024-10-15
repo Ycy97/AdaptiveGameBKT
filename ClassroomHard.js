@@ -24,15 +24,15 @@ class ClassroomHard extends Phaser.Scene{
         this.hintRemaining = 3;
 
         this.hints = {
-            1: 'Get that red ball',
-            2: 'Checkout the fireplace',
-            3: 'Look at the mirror',
-            4: 'Golden music rings in my ear',
-            5: 'Running indoor',
-            6: 'Someone left a candy cane on the ground',
-            7: 'Play the piano',
-            8: 'Check out the fridge',
-            9: 'Silver key to the last door in the lounge',
+            1: 'An antique vase...',
+            2: 'A painting lies surrounded with vases',
+            3: 'Check out the fossil',
+            4: 'Head to the praying altar...',
+            5: 'Check out those katanas',
+            6: 'How did a pond appear in the room?',
+            7: 'Shattered displays',
+            8: 'Speak to the clerk!',
+            9: 'Hidden among the bookshelves',
             10: 'That was fun, lets head to the next area!'
           };
     }
@@ -95,12 +95,8 @@ class ClassroomHard extends Phaser.Scene{
         finalLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
-        const centerX = this.cameras.main.width / 2;
-        const centerY = this.cameras.main.height / 2;
         const mapWidth = map.widthInPixels;
         const mapHeight = map.heightInPixels;
-        const cameraX = centerX - (mapWidth / 2);
-        const cameraY = centerY - (mapHeight / 2);
         this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
         this.player = this.physics.add.sprite(432, 500, 'player');
@@ -507,7 +503,7 @@ class ClassroomHard extends Phaser.Scene{
         // The text of the welcome message
         const welcomeText = "Welcome to the Third Classroom!\n\n"+
             "Your first clue is: \n\n" +
-            "Find the golden globe!"
+            "Check out that triceratops!"
         
         // Create the text object for the welcome message
         const message = this.add.text(cameraCenterX, cameraCenterY, welcomeText, {

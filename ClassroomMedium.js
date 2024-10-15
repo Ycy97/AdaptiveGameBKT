@@ -167,7 +167,7 @@ class ClassroomMedium extends Phaser.Scene{
             }
         
             // Check if near the door and if all previous puzzles are solved
-            if (this.nearDoor && this.lastSolvedId === 5 && this.passcodeNumbers.length === 5) {
+            if (this.nearDoor && this.lastSolvedId === 8 && this.passcodeNumbers.length === 8) {
                 this.askForPasscode();
                 return; // Exit the function after triggering the passcode dialog
             }

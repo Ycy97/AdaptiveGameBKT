@@ -75076,6 +75076,35 @@
          "spacing":0,
          "tilecount":1248,
          "tileheight":32,
+         "tiles":[
+                {
+                 "id":676,
+                 "properties":[
+                        {
+                         "name":"door",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":692,
+                 "properties":[
+                        {
+                         "name":"door",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"interactable",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }],
          "tilewidth":32
         }, 
         {
