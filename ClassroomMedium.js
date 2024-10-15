@@ -30,7 +30,7 @@ class ClassroomMedium extends Phaser.Scene{
             3: 'Speak to the clerk!',
             4: 'Check out the globe',
             5: 'Look at the bookstand!',
-            6: 'Check out the color palette',
+            6: 'Check out the paints',
             7: 'Something is written on the blackboard...',
             8: 'That was fun, lets head to the next room!'
           };
@@ -827,7 +827,7 @@ class ClassroomMedium extends Phaser.Scene{
         element.style.left = '50%';
         element.style.transform = 'translate(-50%, -50%)';
         element.style.fontSize = '20px'; // Big enough to match your game's style
-        element.maxLength = 5; // Limit to 5 characters
+        element.maxLength = 8; // Limit to 5 characters
         element.id = 'user-passcode-input';
     
         document.body.appendChild(element);

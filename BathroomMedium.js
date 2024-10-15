@@ -836,7 +836,7 @@ class BathroomMedium extends Phaser.Scene{
         element.style.left = '50%';
         element.style.transform = 'translate(-50%, -50%)';
         element.style.fontSize = '20px'; // Big enough to match your game's style
-        element.maxLength = 5; // Limit to 5 characters
+        element.maxLength = 8; // Limit to 5 characters
         element.id = 'user-passcode-input';
     
         document.body.appendChild(element);
