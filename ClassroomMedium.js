@@ -6,7 +6,6 @@ class ClassroomMedium extends Phaser.Scene{
         this.canInteract = true; // Flag to control interaction cooldown
         this.dialogText = null; // Placeholder for the dialog text object
         this.questions = []; // Store fetched questions
-        this.npcDialogBox = null; // Separate dialog box for NPC interactions
         this.dialogWidth = null;  
         this.dialogHeight = null; 
         this.questionActive = false; // Flag to check if a question is currently active
@@ -15,18 +14,24 @@ class ClassroomMedium extends Phaser.Scene{
         this.passcodeNumbers = []; // Array to store passcode numbers
         this.hudText = null; // HUD text object
         this.timerText = null;
+        this.lifePointsText = null;
+        this.lifePointsValue = 5;
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
         this.knowledge_state = 0.5;
+        this.hintText = [];
+        this.hintActive = false;
+        this.hintRemaining = 3;
 
-        //hints need to be modified
         this.hints = {
-            1: 'Try looking at one of the bookshelves.',
-            2: 'That plant seems oddly suspicious?',
-            3: 'There is something written on the bookstand...',
-            4: 'Try to look out of the window?',
-            5: 'That was fun! Lets go to the next room!',
-            // ... more hints
+            1: 'Lets try the collection of vases',
+            2: 'One of the table contains the question for the next passcode',
+            3: 'Speak to the clerk!',
+            4: 'Check out the globe',
+            5: 'Look at the bookstand!',
+            6: 'Check out the color palette',
+            7: 'Something is written on the blackboard...',
+            8: 'That was fun, lets head to the next room!'
           };
 
     }//end of constructor
@@ -54,12 +59,10 @@ class ClassroomMedium extends Phaser.Scene{
         this.fetchQuestions().then(() => {
             console.log('Questions loaded:', this.questions);
             this.createDialogComponents();
-            // Proceed with other setup tasks that depend on questions
         }).catch(error => {
             console.error('Failed to load questions:', error);
         });
         
-        // Define movespeed
         this.movespeed = 120; // Adjust the value as needed
 
         // Create the map object
@@ -79,12 +82,8 @@ class ClassroomMedium extends Phaser.Scene{
         miscLayer.setCollisionByProperty({ collision: true });
 
         // Center the map on the screen
-        const centerX = this.cameras.main.width / 2;
-        const centerY = this.cameras.main.height / 2;
         const mapWidth = map.widthInPixels;
         const mapHeight = map.heightInPixels;
-        const cameraX = centerX - (mapWidth / 2);
-        const cameraY = centerY - (mapHeight / 2);
         this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
         this.player = this.physics.add.sprite(432, 500, 'player');
@@ -124,16 +123,15 @@ class ClassroomMedium extends Phaser.Scene{
             frames: this.anims.generateFrameNumbers('player', { start: 0, end: 5 }),
         });
 
-        // define keys
-        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-        keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-        keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
-
         this.clockLoop = this.sound.add('clockLoop', { loop: true});
         this.clockLoop.play({ rate: 1.5, volume: 0.5})
+
+        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keySHIFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+        keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
 
         // Overlap check for interactable objects in furnitureLayer
         this.physics.add.overlap(this.player, furnitureLayer, (player, tile) => {
@@ -160,16 +158,7 @@ class ClassroomMedium extends Phaser.Scene{
             }
         }, null, this);
 
-        // Create an overlap with the NPC
-        this.physics.add.overlap(this.player, furnitureLayer, (player, tile) => {
-            if (tile.properties.npc) {
-                //console.log('Player is NPC');
-                this.nearNPC = true;
-                this.NPCTile = tile;
-            }
-        }, null, this);
-
-        keyE.on('down', () => {
+        keySHIFT.on('down', () => {
             if (!this.canInteract) return; // Exit if interaction is on cooldown
 
             // Early exit if a question is currently active
@@ -183,21 +172,17 @@ class ClassroomMedium extends Phaser.Scene{
                 return; // Exit the function after triggering the passcode dialog
             }
         
-            // Adding additional spatial check for NPC proximity
-            if (this.nearNPC) {
-                console.log('NPC interaction');
-                this.showNPCDialog();
-            } else {
-                this.nearNPC = false; // Ensure nearNPC is reset if not in proximity
-            }
-
             // Handle interactions with other objects
             if (this.isInteractable) {
                 const interactableId = this.currentInteractable.properties['id'];
-                if (interactableId <= 5 && interactableId === this.lastSolvedId + 1) {
+                if (interactableId <= 8 && interactableId === this.lastSolvedId + 1) {
                     console.log('Interacting with object:', interactableId);
                     this.showDialogBox();
-                } else {
+                }
+                else if(interactableId === -1){
+                    this.gptDialog();
+                }
+                else {
                     //this.showPopupMessage('Please solve the previous challenge first.', 3000);
                     console.log('No interactable objects in range')
                 }
@@ -209,32 +194,63 @@ class ClassroomMedium extends Phaser.Scene{
                 this.canInteract = true;
             });
         
-            // If the code execution reaches this point, the player is not interacting with any object or door
             console.log('No interactable object in range.');
         });
         
         // Call the function to create UI components for the dialog box
         this.createDialogComponents();
 
-        let hudTextX = 500; // 500 pixels from the right edge
-        let hudTextY = 245; // 175 pixels from the top
-
-        // Create the HUD text at the specified position
-        this.hudText = this.add.text(hudTextX, hudTextY, 'Passcode: ', {
-            fontSize: '16px',
-            fill: '#ffffff'
-        }).setScrollFactor(1).setOrigin(1, 0); // Align text to the top-right
-
-        let timerX = 380; // 380 pixels from the right edge
-        let timerY = 205; // 155 pixels from the top
+        let timerOffsetX = -50;
+        let timerOffsetY = 100;
+        let timerX = this.player.x + timerOffsetX; // 380 pixels from the right edge
+        let timerY = this.player.y - timerOffsetY ; // 155 pixels from the top
 
         // Initialize the timer text
         this.timerText = this.add.text(timerX, timerY, 'Time: 10:00', {
             fontSize: '16px',
             fill: '#ffffff'
         }).setScrollFactor(1); // Keep the timer static on the screen
+        this.timerText.setStyle({
+            backgroundColor: '#0008', // Semi-transparent black background
+            padding: { x: 10, y: 5 }
+        });
 
-        // Now create the welcome message
+        let lifepointsX = timerX;
+        let lifepointsY = timerY + 20;
+      
+        this.lifePointsText = this.add.text(lifepointsX, lifepointsY, 'Lives: ' + this.lifePointsValue, {
+            fontSize: '16px',
+            fill: '#ffffff'
+        }).setScrollFactor(1);
+        this.lifePointsText.setStyle({
+            backgroundColor: '#0008',
+            padding: { x: 10, y: 5 }
+        });
+
+        let hudTextX = timerX; 
+        let hudTextY = lifepointsY + 20; 
+
+        this.hudText = this.add.text(hudTextX, hudTextY, 'Passcode: ', {
+            fontSize: '16px',
+            fill: '#ffffff'
+        }).setScrollFactor(1);
+
+        this.hudText.setStyle({
+            backgroundColor: '#0008',
+            padding: { x: 10, y: 5 }
+        });
+
+        let hintX  = timerX;
+        let hintY = hudTextY + 20;
+        this.hintText = this.add.text(hintX,hintY, 'Hints Remaining:' + this.hintRemaining, {
+            fontSize: '16px',
+            fill: '#ffffff'
+        }).setScrollFactor(1);
+        this.hintText.setStyle({
+            backgroundColor: '#0008',
+            padding: { x: 10, y: 5 }
+        });
+
         this.createWelcomeMessage();
     }
 
@@ -273,6 +289,26 @@ class ClassroomMedium extends Phaser.Scene{
             this.scene.start('ClassroomHard');
         }
 
+        let timerOffsetX = -50;
+        let timerOffsetY = 100;
+        let timerX = this.player.x + timerOffsetX; // 380 pixels from the right edge
+        let timerY = this.player.y - timerOffsetY ; // 155 pixels from the top
+
+        this.timerText.setPosition(timerX, timerY);
+
+        let lifepointsX = timerX;
+        let lifepointsY = timerY + 20;
+        this.lifePointsText.setPosition(lifepointsX,lifepointsY);
+
+        let hudTextX = timerX; 
+        let hudTextY = lifepointsY + 20;
+        this.hudText.setText(`Passcode: ${this.passcodeNumbers.join('')}`).setPosition(hudTextX,hudTextY);
+
+        let hintX  = timerX;
+        let hintY = hudTextY + 20;
+        
+        this.hintText.setPosition(hintX,hintY);
+
         // Reset the interactable state if not overlapping
         if (!this.player.body.touching.none) {
             this.isInteractable = false;
@@ -299,101 +335,147 @@ class ClassroomMedium extends Phaser.Scene{
             button.setPosition(this.dialogBox.x, currentY);
             currentY += button.height + buttonSpacing;
         });
-
-        this.hudText.setText(`Passcode: ${this.passcodeNumbers.join('')}`);
     }
 
-    showNPCDialog() {
-        const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
-        const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
-    
-        // Define the text for the NPC dialog and links
-        const npcDialogText = "Here's a hint to help you with numbers.\n Check out these resources:";
-        const tipsLinkText = "Learn Numbers Tips";
-        const videoLinkText = "Watch Numbers Videos";
-    
-        // Set the width and height of the dialog box
-        const dialogWidth = this.cameras.main.width * 0.8 / this.cameras.main.zoom;
-        const dialogHeight = 200; // Set an appropriate height to contain all the text
-    
-        // Create the semi-transparent dialog box
-        this.npcDialogBox = this.add.rectangle(cameraCenterX + 350, cameraCenterY + 80, dialogWidth, dialogHeight, 0x000000, 0.8)
-            .setOrigin(0.5)
-            .setInteractive()
-            .setScrollFactor(0);
-    
-        // Create the NPC dialog text
-        const dialog = this.add.text(cameraCenterX + 350, cameraCenterY + 20, npcDialogText, {
-            fontSize: '16px',
-            fill: '#ffffff',
-            align: 'center',
-            wordWrap: { width: dialogWidth - 40 }
-        }).setOrigin(0.5).setScrollFactor(0);
-    
-        // Create the tips link text
-        const tipsLink = this.add.text(cameraCenterX + 350, cameraCenterY + 70, tipsLinkText, {
-            fontSize: '16px',
-            fill: '#00ffff',
-            fontStyle: 'underline'
-        }).setOrigin(0.5)
-          .setInteractive()
-          .setScrollFactor(0);
-    
-        // Create the video link text
-        const videoLink = this.add.text(cameraCenterX + 350, cameraCenterY + 100, videoLinkText, {
-            fontSize: '16px',
-            fill: '#00ffff',
-            fontStyle: 'underline'
-        }).setOrigin(0.5)
-          .setInteractive()
-          .setScrollFactor(0);
-    
-        // Interactive links callbacks
-        tipsLink.on('pointerdown', () => window.open('https://www.khanacademy.org/math/numbers', '_blank'));
-        videoLink.on('pointerdown', () => window.open('https://www.youtube.com/results?search_query=numbers+tutorials', '_blank'));
-    
-        // Create the close button
-        const closeButton = this.add.text(cameraCenterX + 350, cameraCenterY + 150, 'Close', {
-            fontSize: '16px',
-            fill: '#ffffff',
-            backgroundColor: '#666',
-            padding: { x: 10, y: 5 }
-        }).setOrigin(0.5)
-          .setInteractive()
-          .setScrollFactor(0);
+    displayGptResponse(gptResponse){
+        console.log("Entered prompt area");
+        //create a dialog component
+        const gptDialogBoxcx = document.createElement('div');
+        gptDialogBoxcx.style.position = 'fixed';
+        gptDialogBoxcx.style.top = '50%';
+        gptDialogBoxcx.style.left = '50%';
+        gptDialogBoxcx.style.transform = 'translate(-50%, -50%)';
+        gptDialogBoxcx.style.width = '1000px';
+        gptDialogBoxcx.style.height = '800px';
+        gptDialogBoxcx.style.padding = '20px';
+        gptDialogBoxcx.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        gptDialogBoxcx.style.color = '#ffffff';
+        gptDialogBoxcx.style.borderRadius = '10px';
+        gptDialogBoxcx.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
+        gptDialogBoxcx.style.zIndex = '1000'; // Ensure it's above other elements
+        gptDialogBoxcx.style.display = 'flex';
+        gptDialogBoxcx.style.flexDirection = 'column'; // Stack elements vertically
+        gptDialogBoxcx.style.justifyContent = 'center'; // Center vertically
+        gptDialogBoxcx.style.alignItems = 'center'; // Center horizontally
+        document.body.appendChild(gptDialogBoxcx);
 
-        closeButton.on('pointerdown', () => {
-            // Reset all relevant flags and visibility states
-            this.npcDialogBox.setVisible(false);
-            dialog.setVisible(false);
-            tipsLink.setVisible(false);
-            videoLink.setVisible(false);
-            closeButton.setVisible(false);
-        
-            this.nearNPC = false;
-            this.isInteractable = false;
-            this.questionActive = false; // Make sure this is reset when NPC dialog is closed
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '✖'; // Close icon
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '10px';
+        closeButton.style.right = '10px';
+        closeButton.style.background = 'none';
+        closeButton.style.border = 'none';
+        closeButton.style.color = '#ffffff';
+        closeButton.style.fontSize = '20px';
+        closeButton.style.cursor = 'pointer';
+        gptDialogBoxcx.appendChild(closeButton);
+
+        const gptResponseText = document.createElement('p');
+        gptResponseText.innerText = gptResponse;
+        gptResponseText.style.textAlign = 'center';
+        gptResponseText.style.fontSize = '24px';
+        gptDialogBoxcx.appendChild(gptResponseText);
+
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(gptDialogBoxcx); // Remove the dialog box
+            this.scene.resume(); // Resume the scene
         });
-    
-        // Make everything visible
-        this.npcDialogBox.setVisible(true);
-        dialog.setVisible(true);
-        tipsLink.setVisible(true);
-        videoLink.setVisible(true);
-        closeButton.setVisible(true);
     }
 
+    gptDialog(){
+        this.scene.pause();
+
+        let hintLeft = parseInt(this.hintRemaining, 10);
+        if(hintLeft < 1){
+            this.scene.resume();
+            return;
+        }
+        //Create modal view background
+        const modalBackground = document.createElement('div');
+        modalBackground.style.position = 'fixed';
+        modalBackground.style.top = '0';
+        modalBackground.style.left = '0';
+        modalBackground.style.width = '100%';
+        modalBackground.style.height = '100%';
+        modalBackground.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Grey background
+        modalBackground.style.display = 'flex';
+        modalBackground.style.justifyContent = 'center';
+        modalBackground.style.alignItems = 'center';
+        modalBackground.style.zIndex = '999'; // Ensure it's on top
+
+
+        // Create an HTML input element overlay
+        const inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.style.position = 'absolute';
+        inputElement.style.top = '50%'; // Center on screen
+        inputElement.style.left = '50%';
+        inputElement.style.transform = 'translate(-50%, -50%)';
+        inputElement.style.fontSize = '30px'; // Big enough to match your game's style
+        inputElement.style.width = '1200px'; // Set a specific width
+        inputElement.style.height = '100px'; // Set a specific height
+        inputElement.placeholder = "Enter your question prompt to access the hints";
+    
+        document.body.appendChild(modalBackground);
+        modalBackground.appendChild(inputElement);
+        inputElement.focus(); // Automatically focus the input field
+
+
+        // Handle the input submission
+        inputElement.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                //pass the question as form of prompt to gpt api and get a response back before scene resume
+                let prompt = inputElement.value;
+                const data = {
+                   prompt
+                };
+                console.log(JSON.stringify(data));
+                document.body.removeChild(modalBackground);
+                //reduce hint usage
+                let hintLeft = parseInt(this.hintRemaining, 10) - 1; // Subtract 1 from the current life points
+                // Update hint remaining
+                this.hintText.setText('Hints Remaining: ' + hintLeft);
+                this.hintRemaining = hintLeft.toString();
+                //API to call BKT and get student mastery
+                fetch('http://127.0.0.1:5000/chatgpt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('ChatGPT response', data);
+                    //access the value obtained
+                    let fetchResponse = data.response;
+                    console.log('fetchedResponse', fetchResponse)
+                    //display the response on the game
+                    this.displayGptResponse(fetchResponse);
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+            }
+        });
+
+    }
 
     createWelcomeMessage() {
         // Calculate the center of the camera view
         const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
         const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
         
-        //hardcoded
         // The text of the welcome message
-        const welcomeText = "Welcome to the 2nd Maths Escape Room!\n\n"+
+        const welcomeText = "Welcome to the second Classroom!\n\n"+
             "Your first clue is: \n\n" +
-            "Find the golden globe!"
+            "Check out the painting!"
         
         // Create the text object for the welcome message
         const message = this.add.text(cameraCenterX, cameraCenterY, welcomeText, {
@@ -573,12 +655,6 @@ class ClassroomMedium extends Phaser.Scene{
 
     showDialogBox() {
 
-        // Check if npcDialogBox exists and reset it
-        if (this.npcDialogBox) {
-            this.npcDialogBox.setVisible(false); // Hide NPC dialog box
-            this.npcDialogBox = null; // Reset the property
-        }
-
         console.log('Question Opened');
         // Only generate a new question if one isn't already active.
         if (this.currentQuestionIndex === null) {
@@ -627,16 +703,11 @@ class ClassroomMedium extends Phaser.Scene{
         this.answerButtons.forEach(button => button.setVisible(false));
     
         // Get the correct answer for the current question
-        const correctAnswer = this.currentQuestion.correct_answer.toString();
-        console.log("The correct answer is : ", correctAnswer);
-        console.log("The correct answer type is ", typeof(correctAnswer));
-
+        const correctAnswer = this.currentQuestion.correct_answer;
+    
         // Check if the selected answer is correct
         const isCorrect = selected === correctAnswer;
-        console.log("The selected answer is ", selected);
-        console.log("The selected answer type is ", typeof(selected));
         const resultText = isCorrect ? 'Correct!' : 'Incorrect!';
-        console.log("The response : ", resultText);
     
         // Prepare the result lines
         let resultLines = [
@@ -644,16 +715,14 @@ class ClassroomMedium extends Phaser.Scene{
             resultText
         ];
         
-
-        //need to add logic here to log all response and save into a data structure before being processed into SQL -CY
-        //what i need is to log student id, skill id/name, correctness, question ID [[]]
         if (isCorrect) {
-
-            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 1, "Numbers");
+            
+            let sessionUser = sessionStorage.getItem("username");
+            this.recordResponse(sessionUser, this.currentQuestionIndex, 1, "NumbersMedium");
             console.log("saved correct response");
 
             //call the BKT API new & update the knowledge state
-            this.getMastery(this.knowledge_state, 1, 'easy', 0.8);
+            this.getMastery(this.knowledge_state, 1, 'medium', 0.8);
             console.log("Knowledge state updated : ", this.knowledge_state)
 
             // Get the correct hint for the next object ID
@@ -676,11 +745,23 @@ class ClassroomMedium extends Phaser.Scene{
             this.lastSolvedId = this.currentInteractable.properties['id'];
         }
         else{
-            this.recordResponse("6zkEsmR", this.currentQuestionIndex, 0, "Numbers");
+            let sessionUser = sessionStorage.getItem("username");
+            this.recordResponse(sessionUser, this.currentQuestionIndex, 0, "NumbersMedium");
             console.log("saved wrong response");
-            //call the BKT API new & update the knowledge state
-            this.getMastery(this.knowledge_state, 0, 'easy', 0.8);
+            this.getMastery(this.knowledge_state, 0, 'medium', 0.8);
             console.log("Knowledge state updated : ", this.knowledge_state)
+            let updateLife = parseInt(this.lifePointsValue, 10) - 1;
+            this.lifePointsText.setText('Lives: ' + updateLife);
+
+            if (updateLife < 1){
+                this.showPopupMessage('No more lives!\n You will be redirected to the main menu screen in 5 seconds', 5000);
+                // When the countdown ends, the game will reload in 10 seconds
+                this.time.delayedCall(5000, () => {
+                    window.location.href = "mainMenu.html";
+                });
+            }
+
+            this.lifePointsValue = updateLife.toString();
         }
         
         // Update the question text to show the result and hint if applicable

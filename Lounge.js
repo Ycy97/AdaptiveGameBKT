@@ -785,9 +785,6 @@ class Lounge extends Phaser.Scene {
             //call the BKT API new & update the knowledge state
             this.getMastery(this.knowledge_state, 0, 'easy', 0.8);
             console.log("Knowledge state updated : ", this.knowledge_state)
-
-            //decrease lifepoints value
-            // Decrease life points value
             console.log("LifePoints value before: ", this.lifePointsValue);
             let updateLife = parseInt(this.lifePointsValue, 10) - 1; // Subtract 1 from the current life points
             console.log("updateLife value before: ", updateLife);
