@@ -236,7 +236,7 @@ def chatgpt_prompt():
     data = request.json
     prompt = data.get('prompt')
     #Augment the prompt to not provide answers but hints instead
-    augment =  "Do not provide the direct answers except for formulas. Give me the hints only with simple explanation."
+    augment =  "Do not provide the direct answers except for formulas. Give me the hints only with simple explanation within 3 sentences.Dont have to bold or italic the response."
     prompt = prompt + augment
 
     if not prompt:

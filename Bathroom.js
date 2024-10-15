@@ -10,6 +10,7 @@ class Bathroom extends Phaser.Scene {
         this.dialogWidth = null;  
         this.dialogHeight = null; 
         this.questionActive = false;
+        this.gptDialogActive = false;
         this.currentQuestionIndex = null;
         this.lastSolvedId = 0;
         this.passcodeNumbers = [];
@@ -166,6 +167,10 @@ class Bathroom extends Phaser.Scene {
 
             // Early exit if a question is currently active
             if (this.questionActive) {
+                return;
+            }
+
+            if(this.gptDialogActive){
                 return;
             }
         
@@ -395,10 +400,12 @@ class Bathroom extends Phaser.Scene {
 
     gptDialog(){
         this.scene.pause();
+        this.gptDialogActive = true;
 
         let hintLeft = parseInt(this.hintRemaining, 10);
         if(hintLeft < 1){
             this.scene.resume();
+            this.gptDialogActive = false;
             return;
         }
         //Create modal view background
@@ -468,6 +475,9 @@ class Bathroom extends Phaser.Scene {
                     console.log('fetchedResponse', fetchResponse)
                     //display the response on the game
                     this.displayGptResponse(fetchResponse);
+                    this.time.delayedCall(500, () => { // Re-enable interactions after 500ms
+                        this.gptDialogActive = false;
+                    });
                 })
                 .catch(error => {
                     console.error('There was a problem with the fetch operation:', error);
