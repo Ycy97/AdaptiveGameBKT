@@ -23,6 +23,7 @@ class Lounge extends Phaser.Scene {
         this.hintText = [];
         this.hintActive = false;
         this.hintRemaining = 3;
+        this.currentClueMessage = "Lets play some games at the arcade machine."
 
         this.hints = {
             1: 'Grab a paddle and lets play ping-pong!',
@@ -262,22 +263,57 @@ class Lounge extends Phaser.Scene {
         //hint button
         let hintX  = timerX;
         let hintY = hudTextY + 20;
+
         this.hintText = this.add.text(hintX,hintY, 'Hints Remaining:' + this.hintRemaining, {
             fontSize: '16px',
             fill: '#ffffff'
         }).setScrollFactor(1);
+
         this.hintText.setStyle({
             backgroundColor: '#0008', // Semi-transparent black background
             padding: { x: 10, y: 5 }
         });
 
-        // this.hintText = this.add.text(hintX, hintY, 'AI Bot!').setInteractive().setScrollFactor(1);
-        // this.hintText.setStyle({
-        //     backgroundColor: '#666',
-        // });
+        // //clue button
+        // let clueX  = timerX  +20;
+        // let clueY = hintY + 50;
 
-        // this.hintText.on('pointerdown', () =>{
-        //     this.gptDialog();
+        // this.clueText = this.add.text(clueX,clueY, 'Click for Current Clue', {
+        //     fontSize: '16px',
+        //     fill: '#ffffff',
+        //     backgroundColor: '#0008',
+        // }).setScrollFactor(1).setInteractive();
+
+
+        // this.clueText.on('pointerdown', () =>{
+        
+        //     //create a dialog box that show current puzzle and a close button for it
+        //     const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
+        //     const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
+            
+        //     const clueMessagePrompt = this.add.text(cameraCenterX, cameraCenterY, this.currentClueMessage, {
+        //         fontSize: '16px',
+        //         fill: '#ffffff',
+        //         backgroundColor: '#000000bb', // semi-transparent black background
+        //         align: 'center',
+        //         padding: { x: 20, y: 10 },
+        //         wordWrap: { width: this.cameras.main.width * 0.8 / this.cameras.main.zoom }
+        //     }).setScrollFactor(1);
+
+        //     const clueCloseButton = this.add.text(cameraCenterX, clueMessagePrompt.y + clueMessagePrompt.height / 2 + 20, 'Close', {
+        //         fontSize: '16px',
+        //         fill: '#ffffff',
+        //         backgroundColor: '#666',
+        //         padding: { x: 10, y: 5 },
+        //     }).setInteractive().setScrollFactor(1);
+
+        //     clueCloseButton.on('pointerdown', () => {
+        //         clueMessagePrompt.setVisible(false);
+        //         clueCloseButton.setVisible(false);
+        //     });
+   
+        //     clueMessagePrompt.setVisible(true);
+        //     clueCloseButton.setVisible(true);
         // });
 
         // Now create the welcome message
@@ -343,11 +379,16 @@ class Lounge extends Phaser.Scene {
         
         this.hintText.setPosition(hintX,hintY);
 
-        // Reset the interactable state if not overlapping
-        if (!this.player.body.touching.none) {
-            this.isInteractable = false;
-            this.dialogText.setVisible(false); // Hide the dialog when not interacting
-        }
+        // let clueX  = timerX;
+        // let clueY = hintY + 20;
+        
+        // this.clueText.setPosition(clueX,clueY);
+
+        // // Reset the interactable state if not overlapping
+        // if (!this.player.body.touching.none) {
+        //     this.isInteractable = false;
+        //     this.dialogText.setVisible(false); // Hide the dialog when not interacting
+        // }
 
         // Use this.dialogWidth and this.dialogHeight here
         const camCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
@@ -441,6 +482,18 @@ class Lounge extends Phaser.Scene {
         modalBackground.style.alignItems = 'center';
         modalBackground.style.zIndex = '999'; // Ensure it's on top
 
+         //create current clue display
+         const clueText = document.createElement('p');
+         clueText.innerText = "Current Clue : " + this.currentClueMessage;
+         clueText.style.position = 'absolute';
+         clueText.style.top = '35%'; // Center on screen
+         clueText.style.left = '50%';
+         clueText.style.transform = 'translate(-50%, -50%)';
+         clueText.style.fontSize = '35px';
+         clueText.style.color = '#ffffff';
+         clueText.style.width = '1200px'; // Set a specific width
+         clueText.style.backgroundColor = '#000000';  // Black background
+        
 
         // Create an HTML input element overlay
         const inputElement = document.createElement('input');
@@ -453,9 +506,27 @@ class Lounge extends Phaser.Scene {
         inputElement.style.width = '1200px'; // Set a specific width
         inputElement.style.height = '100px'; // Set a specific height
         inputElement.placeholder = "Enter your question prompt to access the hints";
-    
+
+        const closeBtn = document.createElement('button');
+        closeBtn.innerText = "Close";  // Button text
+        closeBtn.style.position = 'absolute';
+        closeBtn.style.top = '60%';  // Position below the input element
+        closeBtn.style.left = '50%';
+        closeBtn.style.transform = 'translate(-50%, -50%)';
+        closeBtn.style.fontSize = '24px';  // Adjust the font size for the button
+        closeBtn.style.padding = '10px 20px';  // Button padding
+        closeBtn.style.cursor = 'pointer';  // Change cursor on hover
+
+        closeBtn.addEventListener('click', () => {
+            document.body.removeChild(modalBackground); // Remove the dialog box
+            this.scene.resume(); // Resume the scene
+            this.gptDialogActive = false; 
+        });
+       
         document.body.appendChild(modalBackground);
+        modalBackground.appendChild(clueText);
         modalBackground.appendChild(inputElement);
+        modalBackground.appendChild(closeBtn);
         inputElement.focus(); // Automatically focus the input field
 
 
@@ -507,53 +578,63 @@ class Lounge extends Phaser.Scene {
     }
 
     createWelcomeMessage() {
-        // Calculate the center of the camera view
-        const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
-        const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
+
+        //start timer when they enter the room
+        this.time.addEvent({
+            delay: 1000, // 1000ms = 1 second
+            callback: this.updateTimer,
+            callbackScope: this, // Corrected the typo here
+            loop: true
+        });
+
+        // // Calculate the center of the camera view
+        // const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
+        // const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
         
-        //hardcoded
-        // The text of the welcome message
-        const welcomeText = "Welcome to the Maths Escape Room!\n\n" +
-            "Use the arrow keys to move around.\n" +
-            "Use SHIFT key to interact with objects.\n\n" +
-            "Your first clue is: \n" +//+ this.hints[1]; // Use the first hint as an example
-            "Lets play some games at the arcade machine."
+        // //hardcoded
+        // // The text of the welcome message
+        // const welcomeText = "Welcome to the Maths Escape Room!\n\n" +
+        //     "Use the arrow keys to move around.\n" +
+        //     "Use SHIFT key to interact with objects.\n\n" +
+        //     "Your first clue is: \n" +//+ this.hints[1]; // Use the first hint as an example
+        //     "Lets play some games at the arcade machine."
         
-        // Create the text object for the welcome message
-        const message = this.add.text(cameraCenterX, cameraCenterY, welcomeText, {
-            fontSize: '16px',
-            fill: '#ffffff',
-            backgroundColor: '#000000bb', // semi-transparent black background
-            align: 'center',
-            padding: { x: 20, y: 10 },
-            wordWrap: { width: this.cameras.main.width * 0.8 / this.cameras.main.zoom }
-        }).setOrigin(0.5).setScrollFactor(0); // The message should not scroll with the camera
+        // // Create the text object for the welcome message
+        // const message = this.add.text(cameraCenterX, cameraCenterY, welcomeText, {
+        //     fontSize: '16px',
+        //     fill: '#ffffff',
+        //     backgroundColor: '#000000bb', // semi-transparent black background
+        //     align: 'center',
+        //     padding: { x: 20, y: 10 },
+        //     wordWrap: { width: this.cameras.main.width * 0.8 / this.cameras.main.zoom }
+        // }).setOrigin(0.5).setScrollFactor(0); // The message should not scroll with the camera
     
         // Create the close button below the message
-        const closeButton = this.add.text(cameraCenterX, message.y + message.height / 2 + 20, 'Close', {
-            fontSize: '16px',
-            fill: '#ffffff',
-            backgroundColor: '#666',
-            padding: { x: 10, y: 5 },
-        }).setOrigin(0.5).setInteractive().setScrollFactor(0); // The button should not scroll with the camera
+        // const closeButton = this.add.text(cameraCenterX, message.y + message.height / 2 + 20, 'Close', {
+        //     fontSize: '16px',
+        //     fill: '#ffffff',
+        //     backgroundColor: '#666',
+        //     padding: { x: 10, y: 5 },
+        // }).setOrigin(0.5).setInteractive().setScrollFactor(0); // The button should not scroll with the camera
     
-        // When the close button is clicked, hide the message and the button
-        closeButton.on('pointerdown', () => {
-            message.setVisible(false);
-            closeButton.setVisible(false);
+        // // When the close button is clicked, hide the message and the button
+        // closeButton.on('pointerdown', () => {
+            
+        //     message.setVisible(false);
+        //     closeButton.setVisible(false);
 
             // Start the countdown
-            this.time.addEvent({
-                delay: 1000, // 1000ms = 1 second
-                callback: this.updateTimer,
-                callbackScope: this, // Corrected the typo here
-                loop: true
-            });
-        });
+            // this.time.addEvent({
+            //     delay: 1000, // 1000ms = 1 second
+            //     callback: this.updateTimer,
+            //     callbackScope: this, // Corrected the typo here
+            //     loop: true
+            // });
+        // });
     
-        // Make the welcome message and close button visible
-        message.setVisible(true);
-        closeButton.setVisible(true);
+        // // Make the welcome message and close button visible
+        // message.setVisible(true);
+        // closeButton.setVisible(true);
     }
     
     updateTimer() {
@@ -770,6 +851,7 @@ class Lounge extends Phaser.Scene {
             // Get the correct hint for the next object ID
             const nextId = this.lastSolvedId + 1;
             const hintMessage = this.hints[nextId] || "You've solved all the challenges!";
+            this.currentClueMessage = hintMessage;
     
             // Generate a random number for the passcode
             const passcodeNumber = Phaser.Math.Between(0, 9);
