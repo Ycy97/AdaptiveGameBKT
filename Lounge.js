@@ -24,6 +24,7 @@ class Lounge extends Phaser.Scene {
         this.hintActive = false;
         this.hintRemaining = 3;
         this.currentClueMessage = "Lets play some games at the arcade machine."
+        this.consecutiveWrongAttempts = 0; //if 2 in a row wrong provide cutscene to help, if correct reset
 
         this.hints = {
             1: 'Grab a paddle and lets play ping-pong!',
@@ -636,6 +637,151 @@ class Lounge extends Phaser.Scene {
         // message.setVisible(true);
         // closeButton.setVisible(true);
     }
+
+    //trigger when detect student facing issues
+    cutSceneMessage() {
+        // Pause scene -> Display Cutscene -> Close Button -> Resume gameplay
+        this.scene.pause();
+    
+        // Create modal view background
+        const modalBackground = document.createElement('div');
+        modalBackground.style.position = 'fixed';
+        modalBackground.style.top = '0';
+        modalBackground.style.left = '0';
+        modalBackground.style.width = '100%';
+        modalBackground.style.height = '100%';
+        modalBackground.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Grey background
+        modalBackground.style.display = 'flex';
+        modalBackground.style.flexDirection = 'column'; // Stack elements vertically
+        modalBackground.style.justifyContent = 'center';
+        modalBackground.style.alignItems = 'center';
+        modalBackground.style.zIndex = '999'; // Ensure it's on top
+    
+        // Create a container for the carousel
+        const carouselContainer = document.createElement('div');
+        carouselContainer.style.position = 'relative';
+        carouselContainer.style.width = '80%'; // Set width for the container
+        carouselContainer.style.maxWidth = '800px'; // Set a max width for better responsiveness
+        carouselContainer.style.height = '60%'; // Set height for the container
+        carouselContainer.style.overflow = 'hidden'; // Hide overflow
+    
+        // Create a separate image container
+        const imageContainer = document.createElement('div');
+        imageContainer.style.display = 'flex'; // Use flexbox for horizontal arrangement
+        imageContainer.style.transition = 'transform 0.5s ease'; // Smooth transition
+        imageContainer.style.width = '100%'; // Container takes full width
+        imageContainer.style.height = '100%'; // Container takes full height
+        imageContainer.style.alignItems = 'center'; // Center images vertically
+        imageContainer.style.marginTop = '20px'; // Add some margin to separate from the paragraph
+    
+        // Create 3 images of hints
+        const hints = [
+            'assets/cutscenes/algebraHint1Factorizing.png', // Hint 1
+            'assets/cutscenes/algebraHint2Simplify.png',    // Hint 2
+            'assets/cutscenes/algebraHint3SolveEq.png'      // Hint 3
+        ];
+    
+        // Current image index
+        let currentIndex = 0;
+    
+        // Function to load the current image
+        const loadImage = (index) => {
+            // Clear the image container
+            imageContainer.innerHTML = '';
+    
+            const img = document.createElement('img');
+            img.src = hints[index];
+            img.alt = `Hint ${index + 1}`; // Corrected syntax for alt text
+            img.style.width = '100%'; // Each image takes full width of its container
+            img.style.height = '100%'; // Each image takes full height of its container
+            img.style.objectFit = 'contain'; // Maintain aspect ratio while showing the full image
+            imageContainer.appendChild(img);
+        };
+    
+        // Load the first image initially
+        loadImage(currentIndex);
+    
+        // Create left and right navigation buttons
+        const leftButton = document.createElement('button');
+        const rightButton = document.createElement('button');
+    
+        leftButton.innerText = '<'; // Left arrow
+        rightButton.innerText = '>'; // Right arrow
+    
+        // Button styles
+        const buttonStyle = {
+            position: 'absolute',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            backgroundColor: 'transparent', // Make the background transparent
+            border: 'none', // No border
+            fontSize: '24px',
+            color: '#808080', // Grey color for the arrows
+            padding: '10px',
+            cursor: 'pointer',
+            zIndex: '1000', // Ensure buttons are above images
+            transition: 'color 0.3s ease', // Smooth transition for color change
+        };
+    
+        Object.assign(leftButton.style, buttonStyle);
+        Object.assign(rightButton.style, buttonStyle);
+    
+        leftButton.style.left = '10px'; // Position left button
+        rightButton.style.right = '10px'; // Position right button
+    
+        // Function to update the carousel
+        const updateCarousel = () => {
+            loadImage(currentIndex); // Load the image for the current index
+        };
+    
+        // Add event listeners for buttons
+        leftButton.addEventListener('click', () => {
+            currentIndex = (currentIndex > 0) ? currentIndex - 1 : hints.length - 1; // Loop to last image
+            updateCarousel();
+        });
+    
+        rightButton.addEventListener('click', () => {
+            currentIndex = (currentIndex < hints.length - 1) ? currentIndex + 1 : 0; // Loop to first image
+            updateCarousel();
+        });
+    
+        // Append image container to the carousel container
+        carouselContainer.appendChild(imageContainer);
+    
+        // Append buttons to the carousel container
+        carouselContainer.appendChild(leftButton);
+        carouselContainer.appendChild(rightButton);
+    
+        // Append the carousel container to the modal background
+        modalBackground.appendChild(carouselContainer);
+    
+        // Create a close button
+        const closeButton = document.createElement('button');
+        closeButton.innerText = 'Close';
+        closeButton.style.marginTop = '20px'; // Space between carousel and button
+        closeButton.style.padding = '10px 20px'; // Padding for the button
+        closeButton.style.fontSize = '16px'; // Font size for the button
+        closeButton.style.color = '#ffffff'; // White text color
+        closeButton.style.backgroundColor = '#ff0000'; // Red background color
+        closeButton.style.border = 'none'; // No border
+        closeButton.style.borderRadius = '5px'; // Rounded corners
+        closeButton.style.cursor = 'pointer'; // Cursor change on hover
+        closeButton.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.5)'; // Shadow effect
+        closeButton.style.width = '100px'; // Set a width for the button
+    
+        // Add event listener to close the modal
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(modalBackground); // Remove the modal from the DOM
+            this.scene.resume(); // Resume the scene (if needed)
+        });
+    
+        // Append the close button to the modal background
+        modalBackground.appendChild(closeButton);
+    
+        // Append the modal background to the body
+        document.body.appendChild(modalBackground);
+    }
+    
     
     updateTimer() {
         this.initialTime -= 1; // Decrease the timer by one second
@@ -769,8 +915,22 @@ class Lounge extends Phaser.Scene {
             padding: { x: 10, y: 5 },
         }).setOrigin(0.5).setInteractive();
         
-        this.closeButton.on('pointerdown', () => this.closeDialogBox());
+        this.closeButton.on('pointerdown', () => {
+            this.closeDialogBox(); // Corrected the function call
+            let consecutiveWrongAttemptsVal = parseInt(this.consecutiveWrongAttempts, 10);
+            
+            // Check if consecutiveWrongAttemptsVal is greater than or equal to 2
+            if (consecutiveWrongAttemptsVal >= 2) {
+                console.log("Triggering cutscene...");
+                this.cutSceneMessage();
+            }
+        });
+        
         this.closeButton.setVisible(false);
+
+        //if value >=2 trigger cutscene for assistance
+
+        
     }
 
     showDialogBox() {
@@ -840,6 +1000,8 @@ class Lounge extends Phaser.Scene {
         //what i need is to log student id, skill id/name, correctness, question ID [[]]
         if (isCorrect) {
 
+            //reset consecutiveWrongAttempts to 0
+            this.consecutiveWrongAttempts = 0;
             let sessionUser = sessionStorage.getItem("username");
             this.recordResponse(sessionUser, this.currentQuestionIndex, 1, "Algebra");
             console.log("saved correct response");
@@ -869,6 +1031,12 @@ class Lounge extends Phaser.Scene {
             this.lastSolvedId = this.currentInteractable.properties['id'];
         }
         else{
+            //get current value and + 1 for consecutiveWrongAttempts
+
+            let consecutiveWrongAttemptsVal = parseInt(this.consecutiveWrongAttempts, 10) + 1;
+            this.consecutiveWrongAttempts = consecutiveWrongAttemptsVal;
+            console.log("Current consecutive wrong attempts : " + this.consecutiveWrongAttempts);
+
             let sessionUser = sessionStorage.getItem("username");
             //this.recordResponse("6zkEsmR", this.currentQuestionIndex, 0, "Algebra");
             this.recordResponse(sessionUser, this.currentQuestionIndex, 0, "Algebra");
