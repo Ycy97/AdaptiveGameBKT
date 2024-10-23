@@ -889,13 +889,15 @@ class Classroom extends Phaser.Scene {
             `Selected Answer: ${selected}`,
             resultText
         ];
+
+        let currentTime = this.getCurrentDateTimeForSQL();
         
         if (isCorrect) {
 
             this.consecutiveWrongAttempts = 0;
 
             let sessionUser = sessionStorage.getItem("username");
-            this.recordResponse(sessionUser, this.currentQuestionIndex, 1, "Numbers");
+            this.recordResponse(sessionUser, this.currentQuestionIndex, 1, "Numbers", this.knowledge_state, currentTime);
             console.log("saved correct response");
 
             //call the BKT API new & update the knowledge state
@@ -928,7 +930,7 @@ class Classroom extends Phaser.Scene {
             console.log("Current consecutive wrong attempts : " + this.consecutiveWrongAttempts);
             
             let sessionUser = sessionStorage.getItem("username");
-            this.recordResponse(sessionUser, this.currentQuestionIndex, 0, "Numbers");
+            this.recordResponse(sessionUser, this.currentQuestionIndex, 0, "Numbers", this.knowledge_state, currentTime);
             console.log("saved wrong response");
             this.getMastery(this.knowledge_state, 0, 'easy', 0.8);
             console.log("Knowledge state updated : ", this.knowledge_state)
@@ -1025,12 +1027,14 @@ class Classroom extends Phaser.Scene {
 
 
     //added function to record student interaction with questions
-    recordResponse(user_id, question_id, correctness, skill){
+    recordResponse(user_id, question_id, correctness, skill, mastery, created_at){
         const data = {
             user_id,
             question_id,
             correctness,
-            skill
+            skill,
+            mastery,
+            created_at
         };
         
         console.log(JSON.stringify(data));
@@ -1090,6 +1094,18 @@ class Classroom extends Phaser.Scene {
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
         });
+    }
+
+    getCurrentDateTimeForSQL() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
 
 }
