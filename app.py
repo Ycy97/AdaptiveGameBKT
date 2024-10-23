@@ -159,10 +159,12 @@ def save_responses():
     question_id = data.get('question_id')
     correctness = data.get('correctness')
     skill = data.get('skill')
+    mastery = data.get('mastery')
+    created_at = data.get('created_at')
     conn = mysql.connector.connect(**db_config)
     cur = conn.cursor()
-    insert_query = "INSERT INTO student_interaction (user_id, question_id, correctness, skill) VALUES (%s, %s, %s, %s)"
-    cur.execute(insert_query, (user_id, question_id, correctness, skill))
+    insert_query = "INSERT INTO student_interaction (user_id, question_id, correctness, skill, mastery, created_at) VALUES (%s, %s, %s, %s, %s, %s)"
+    cur.execute(insert_query, (user_id, question_id, correctness, skill, mastery, created_at))
     conn.commit()
     cur.close()
     conn.close()

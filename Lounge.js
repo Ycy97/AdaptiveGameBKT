@@ -19,12 +19,12 @@ class Lounge extends Phaser.Scene {
         this.lifePointsValue = 5;
         this.initialTime = 10 * 60; // 10 minutes in seconds
         this.student_responses = [];
-        this.knowledge_state = 0.1;
         this.hintText = [];
         this.hintActive = false;
         this.hintRemaining = 3;
         this.currentClueMessage = "Lets play some games at the arcade machine."
         this.consecutiveWrongAttempts = 0; //if 2 in a row wrong provide cutscene to help, if correct reset
+        this.knowledge_state = 0.1;//dynamically grab from database
 
         this.hints = {
             1: 'Grab a paddle and lets play ping-pong!',
@@ -991,8 +991,9 @@ class Lounge extends Phaser.Scene {
             `Selected Answer: ${selected}`,
             resultText
         ];
-        
 
+        let currentTime = this.getCurrentDateTimeForSQL();
+        
         //need to add logic here to log all response and save into a data structure before being processed into SQL -CY
         //what i need is to log student id, skill id/name, correctness, question ID [[]]
         if (isCorrect) {
@@ -1000,7 +1001,7 @@ class Lounge extends Phaser.Scene {
             //reset consecutiveWrongAttempts to 0
             this.consecutiveWrongAttempts = 0;
             let sessionUser = sessionStorage.getItem("username");
-            this.recordResponse(sessionUser, this.currentQuestionIndex, 1, "Algebra");
+            this.recordResponse(sessionUser, this.currentQuestionIndex, 1, "Algebra", this.knowledge_state, currentTime);
             console.log("saved correct response");
 
             //call the BKT API new & update the knowledge state
@@ -1035,8 +1036,7 @@ class Lounge extends Phaser.Scene {
             console.log("Current consecutive wrong attempts : " + this.consecutiveWrongAttempts);
 
             let sessionUser = sessionStorage.getItem("username");
-            //this.recordResponse("6zkEsmR", this.currentQuestionIndex, 0, "Algebra");
-            this.recordResponse(sessionUser, this.currentQuestionIndex, 0, "Algebra");
+            this.recordResponse(sessionUser, this.currentQuestionIndex, 0, "Algebra", this.knowledge_state, currentTime);
             console.log("saved wrong response");
             //call the BKT API new & update the knowledge state
             this.getMastery(this.knowledge_state, 0, 'easy', 0.8);
@@ -1140,12 +1140,14 @@ class Lounge extends Phaser.Scene {
 
 
     //added function to record student interaction with questions
-    recordResponse(user_id, question_id, correctness, skill){
+    recordResponse(user_id, question_id, correctness, skill, mastery, created_at){
         const data = {
             user_id,
             question_id,
             correctness,
-            skill
+            skill,
+            mastery,
+            created_at
         };
         
         console.log(JSON.stringify(data));
@@ -1206,5 +1208,19 @@ class Lounge extends Phaser.Scene {
             console.error('There was a problem with the fetch operation:', error);
         });
     }
+
+    //function to get current time
+    getCurrentDateTimeForSQL() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    } 
+
    
 }
