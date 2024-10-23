@@ -926,11 +926,7 @@ class Lounge extends Phaser.Scene {
             }
         });
         
-        this.closeButton.setVisible(false);
-
-        //if value >=2 trigger cutscene for assistance
-
-        
+        this.closeButton.setVisible(false); 
     }
 
     showDialogBox() {
