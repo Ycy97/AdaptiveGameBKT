@@ -134,6 +134,21 @@ def get_probabilityandstatistics_questionsHard():
     conn.close()
     return jsonify(questions)
 
+#API to call student latest learner profile based on certain topic
+@app.route('/getLatestProfile', methods=['POST'])
+def getLatestLProfile():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    skill = data.get('skill')
+    conn = mysql.connector.connect(**db_config)
+    cur = conn.cursor(dictionary=True)
+    sql_query = "SELECT * FROM learner_model WHERE user_id = %s AND skill = %s ORDER BY created_at DESC;"
+    cur.execute(sql_query, (user_id, skill))
+    learnerProfile = cur.fetchone()
+    cur.close()
+    conn.close()
+    return jsonify(learnerProfile)
+
 #API to call bkt_yt for ASG, call made per questions answered
 @app.route('/getStudentMastery', methods=['POST'])
 def getStudentMasteries():
