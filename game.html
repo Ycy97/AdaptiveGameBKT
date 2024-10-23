@@ -5,7 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maths Escape Room</title>
 </head>
+<style>
+    /* Basic styling for the buttons */
+    #menu {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    button {
+        margin: 10px;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        width: 200px; /* Set a fixed width for all buttons */
+        text-align: center; /* Center the text */
+    }
+</style>
 <body>
+
+    <div id="menu">
+        <button id="algebra-btn">Algebra</button>
+        <button id="numbers-btn">Numbers</button>
+        <button id="probability-btn">Probability</button>
+    </div>
+
     <!--Load Phaser Library-->
     <script src="phaser.min.js"></script>
 
