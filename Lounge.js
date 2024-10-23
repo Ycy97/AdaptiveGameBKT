@@ -25,6 +25,8 @@ class Lounge extends Phaser.Scene {
         this.currentClueMessage = "Lets play some games at the arcade machine."
         this.consecutiveWrongAttempts = 0; //if 2 in a row wrong provide cutscene to help, if correct reset
         this.knowledge_state = 0.1;//dynamically grab from database
+        this.startTime = null;
+        this.endTime = null;
 
         this.hints = {
             1: 'Grab a paddle and lets play ping-pong!',
@@ -580,6 +582,8 @@ class Lounge extends Phaser.Scene {
 
     createWelcomeMessage() {
 
+        this.startTime = this.getCurrentDateTimeForSQL();
+
         //start timer when they enter the room
         this.time.addEvent({
             delay: 1000, // 1000ms = 1 second
@@ -798,6 +802,20 @@ class Lounge extends Phaser.Scene {
     
         // If the timer reaches zero, end the game
         if(this.initialTime <= 0) {
+
+            this.endTime = this.getCurrentDateTimeForSQL();
+            // Correct passcode
+            //adaptiveMoment
+            let sessionUser = sessionStorage.getItem("username");
+            let user_id = sessionUser;
+            let skill = 'Algebra';
+            let mastery = this.knowledge_state;
+            let timeTaken = this.calculateTimeTaken(this.startTime, this.endTime);
+            let hints_used = 3 - parseInt(this.hintRemaining, 10);
+            let life_remain = 5 - parseInt(this.lifePointsValue, 10);
+            let created_at = this.endTime;
+            this.saveLearnerProgress(user_id, skill, mastery, timeTaken, hints_used, life_remain, created_at);
+            
             this.timeExpired();
         }
     }
@@ -1128,7 +1146,18 @@ class Lounge extends Phaser.Scene {
     
                 if (userPasscode === this.passcodeNumbers.join('')) {
                     this.clockLoop.stop();
+                    this.endTime = this.getCurrentDateTimeForSQL();
                     // Correct passcode
+                    //adaptiveMoment
+                    let sessionUser = sessionStorage.getItem("username");
+                    let user_id = sessionUser;
+                    let skill = 'Algebra';
+                    let mastery = this.knowledge_state;
+                    let timeTaken = this.calculateTimeTaken(this.startTime, this.endTime);
+                    let hints_used = 3 - parseInt(this.hintRemaining, 10);
+                    let life_remain = 5 - parseInt(this.lifePointsValue, 10);
+                    let created_at = this.endTime;
+                    this.saveLearnerProgress(user_id, skill, mastery, timeTaken, hints_used, life_remain, created_at);
                     this.scene.start('LoungeMedium');
                 } else {
                     // Incorrect passcode
@@ -1153,6 +1182,40 @@ class Lounge extends Phaser.Scene {
         console.log(JSON.stringify(data));
         //call the API here to save response
         fetch('http://127.0.0.1:5000/save_response', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    //function to save learner progress to learner model
+    saveLearnerProgress(user_id, skill, mastery, timeTaken, hints_used, life_remain, created_at){
+        const data = {
+            user_id,
+            skill,
+            mastery,
+            timeTaken,
+            hints_used,
+            life_remain,
+            created_at
+        };
+        
+        console.log(JSON.stringify(data));
+        fetch('http://127.0.0.1:5000/save_learner_model', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1220,7 +1283,25 @@ class Lounge extends Phaser.Scene {
         const seconds = String(now.getSeconds()).padStart(2, '0');
     
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    } 
+    }
+    
+    calculateTimeTaken(startTime, endTime) {
+        
+        const startDate = new Date(startTime);
+        const endDate = new Date(endTime);
+    
+        // Calculate the difference in milliseconds
+        const differenceInMilliseconds = endDate - startDate;
+    
+        // Convert milliseconds to seconds, minutes, and hours
+        const totalSeconds = Math.floor(differenceInMilliseconds / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        let timeTaken = hours + " hours" + minutes + " minutes" + seconds + " seconds"
+
+        return timeTaken;
+    }
 
    
 }

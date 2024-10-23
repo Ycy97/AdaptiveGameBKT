@@ -171,6 +171,29 @@ def save_responses():
 
     return response
 
+#API to save user profile to learner model
+@app.route('/save_learner_model', methods=['POST'])
+def save_learnerModel():
+    data =  request.get_json()
+    response = jsonify({'message' : 'Data saved successfully'})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    user_id = data.get('user_id')
+    skill = data.get('skill')
+    mastery = data.get('mastery')
+    timeTaken = data.get('timeTaken')
+    hints_used = data.get('hints_used')
+    life_remain = data.get('life_remain')
+    created_at = data.get('created_at')
+    conn = mysql.connector.connect(**db_config)
+    cur = conn.cursor()
+    insert_query = "INSERT INTO learner_model (user_id, skill, mastery, timeTaken, hints_used, life_remain, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+    cur.execute(insert_query, (user_id, skill, mastery, timeTaken, hints_used, life_remain, created_at))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return response
+
 #API to allow user to login into the game
 @app.route('/login', methods=['POST'])
 def gameLogin():
