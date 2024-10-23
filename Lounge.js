@@ -812,10 +812,10 @@ class Lounge extends Phaser.Scene {
             let mastery = this.knowledge_state;
             let timeTaken = this.calculateTimeTaken(this.startTime, this.endTime);
             let hints_used = 3 - parseInt(this.hintRemaining, 10);
-            let life_remain = 5 - parseInt(this.lifePointsValue, 10);
+            let life_remain = parseInt(this.lifePointsValue, 10);
             let created_at = this.endTime;
             this.saveLearnerProgress(user_id, skill, mastery, timeTaken, hints_used, life_remain, created_at);
-            
+
             this.timeExpired();
         }
     }
@@ -1155,7 +1155,7 @@ class Lounge extends Phaser.Scene {
                     let mastery = this.knowledge_state;
                     let timeTaken = this.calculateTimeTaken(this.startTime, this.endTime);
                     let hints_used = 3 - parseInt(this.hintRemaining, 10);
-                    let life_remain = 5 - parseInt(this.lifePointsValue, 10);
+                    let life_remain = parseInt(this.lifePointsValue, 10);
                     let created_at = this.endTime;
                     this.saveLearnerProgress(user_id, skill, mastery, timeTaken, hints_used, life_remain, created_at);
                     this.scene.start('LoungeMedium');
