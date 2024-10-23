@@ -674,11 +674,12 @@ class Lounge extends Phaser.Scene {
         imageContainer.style.alignItems = 'center'; // Center images vertically
         imageContainer.style.marginTop = '20px'; // Add some margin to separate from the paragraph
     
-        // Create 3 images of hints
         const hints = [
-            'assets/cutscenes/algebraHint1Factorizing.png', // Hint 1
-            'assets/cutscenes/algebraHint2Simplify.png',    // Hint 2
-            'assets/cutscenes/algebraHint3SolveEq.png'      // Hint 3
+            'assets/cutscenes/algebraHint1Factorizing.png',
+            'assets/cutscenes/algebraHint2Simplify.png',
+            'assets/cutscenes/algebraHint3SolveEq.png',
+            'assets/cutscenes/algebraHint4Functions.png',
+            'assets/cutscenes/algebraHint45Simultaneous.png'
         ];
     
         // Current image index

@@ -563,11 +563,16 @@ class Classroom extends Phaser.Scene {
         imageContainer.style.alignItems = 'center'; // Center images vertically
         imageContainer.style.marginTop = '20px'; // Add some margin to separate from the paragraph
     
-        // Create 3 images of hints
+        // Create 8 images of hints
         const hints = [
-            'assets/cutscenes/algebraHint1Factorizing.png', // Hint 1
-            'assets/cutscenes/algebraHint2Simplify.png',    // Hint 2
-            'assets/cutscenes/algebraHint3SolveEq.png'      // Hint 3
+            'assets/cutscenes/numbersHint1FractionSum.png',
+            'assets/cutscenes/numbersHint2Decimal2Fraction.png', 
+            'assets/cutscenes/numbersHint3Percentage.png',
+            'assets/cutscenes/numbersHint4Prime.png',
+            'assets/cutscenes/numbersHint5LCM.png',
+            'assets/cutscenes/numbersHint6GCD.png',
+            'assets/cutscenes/numbersHint7Ratio.png',
+            'assets/cutscenes/numbersHint8QuadraticEq.png'
         ];
     
         // Current image index

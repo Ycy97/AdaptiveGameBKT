@@ -558,11 +558,13 @@ class BathroomMedium extends Phaser.Scene{
         imageContainer.style.alignItems = 'center'; // Center images vertically
         imageContainer.style.marginTop = '20px'; // Add some margin to separate from the paragraph
     
-        // Create 3 images of hints
+        // Create 5 images of hints
         const hints = [
-            'assets/cutscenes/algebraHint1Factorizing.png', // Hint 1
-            'assets/cutscenes/algebraHint2Simplify.png',    // Hint 2
-            'assets/cutscenes/algebraHint3SolveEq.png'      // Hint 3
+            'assets/cutscenes/probHint1Odds.png',
+            'assets/cutscenes/probHint2Mean.png',
+            'assets/cutscenes/probHint3Median.png',
+            'assets/cutscenes/probHint4Mode.png',
+            'assets/cutscenes/probHint5Range.png'
         ];
     
         // Current image index
