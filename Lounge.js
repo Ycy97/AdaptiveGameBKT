@@ -277,50 +277,8 @@ class Lounge extends Phaser.Scene {
             padding: { x: 10, y: 5 }
         });
 
-        // //clue button
-        // let clueX  = timerX  +20;
-        // let clueY = hintY + 50;
-
-        // this.clueText = this.add.text(clueX,clueY, 'Click for Current Clue', {
-        //     fontSize: '16px',
-        //     fill: '#ffffff',
-        //     backgroundColor: '#0008',
-        // }).setScrollFactor(1).setInteractive();
-
-
-        // this.clueText.on('pointerdown', () =>{
-        
-        //     //create a dialog box that show current puzzle and a close button for it
-        //     const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
-        //     const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
-            
-        //     const clueMessagePrompt = this.add.text(cameraCenterX, cameraCenterY, this.currentClueMessage, {
-        //         fontSize: '16px',
-        //         fill: '#ffffff',
-        //         backgroundColor: '#000000bb', // semi-transparent black background
-        //         align: 'center',
-        //         padding: { x: 20, y: 10 },
-        //         wordWrap: { width: this.cameras.main.width * 0.8 / this.cameras.main.zoom }
-        //     }).setScrollFactor(1);
-
-        //     const clueCloseButton = this.add.text(cameraCenterX, clueMessagePrompt.y + clueMessagePrompt.height / 2 + 20, 'Close', {
-        //         fontSize: '16px',
-        //         fill: '#ffffff',
-        //         backgroundColor: '#666',
-        //         padding: { x: 10, y: 5 },
-        //     }).setInteractive().setScrollFactor(1);
-
-        //     clueCloseButton.on('pointerdown', () => {
-        //         clueMessagePrompt.setVisible(false);
-        //         clueCloseButton.setVisible(false);
-        //     });
-   
-        //     clueMessagePrompt.setVisible(true);
-        //     clueCloseButton.setVisible(true);
-        // });
-
         // Now create the welcome message
-        this.createWelcomeMessage();
+        this.createWelcomeMessage("Here is your first clue of the game : \nLets play some games at the arcade machine.");
 
     }
 
@@ -381,17 +339,6 @@ class Lounge extends Phaser.Scene {
         let hintY = hudTextY + 20;
         
         this.hintText.setPosition(hintX,hintY);
-
-        // let clueX  = timerX;
-        // let clueY = hintY + 20;
-        
-        // this.clueText.setPosition(clueX,clueY);
-
-        // // Reset the interactable state if not overlapping
-        // if (!this.player.body.touching.none) {
-        //     this.isInteractable = false;
-        //     this.dialogText.setVisible(false); // Hide the dialog when not interacting
-        // }
 
         // Use this.dialogWidth and this.dialogHeight here
         const camCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
@@ -484,18 +431,18 @@ class Lounge extends Phaser.Scene {
         });
     }
     
-    
-    gptDialog(){
+    gptDialog() {
         this.scene.pause();
         this.gptDialogActive = true;
-
+    
         let hintLeft = parseInt(this.hintRemaining, 10);
-        if(hintLeft < 1){
+        if (hintLeft < 1) {
             this.scene.resume();
             this.gptDialogActive = false;
             return;
         }
-        //Create modal view background
+    
+        // Create modal view background
         const modalBackground = document.createElement('div');
         modalBackground.style.position = 'fixed';
         modalBackground.style.top = '0';
@@ -507,71 +454,77 @@ class Lounge extends Phaser.Scene {
         modalBackground.style.justifyContent = 'center';
         modalBackground.style.alignItems = 'center';
         modalBackground.style.zIndex = '999'; // Ensure it's on top
+    
+        // Create current clue display
+        const clueText = document.createElement('p');
+        clueText.innerText = "Current Clue: " + this.currentClueMessage;
+        clueText.style.position = 'absolute';
+        clueText.style.top = '30%'; // Adjusted position
+        clueText.style.left = '50%';
+        clueText.style.transform = 'translate(-50%, -50%)'; // Centers the text
+        clueText.style.fontSize = '35px';
+        clueText.style.color = '#8B4513'; // Brown text color
+        clueText.style.width = '1200px'; // Set a specific width
+        clueText.style.backgroundColor = '#f5deb3'; // Wheat-like background
+        clueText.style.fontFamily = '"Press Start 2P", monospace'; // Pixelated font
+        clueText.style.imageRendering = 'pixelated'; // Makes the text look pixelated on certain browsers
+        clueText.style.wordSpacing = '5px'; // Increase spacing between words
+        clueText.style.lineHeight = '1.6'; // Increase line height for better aesthetics
+        clueText.style.padding = '10px'; // Add padding for better aesthetics
+        clueText.style.textAlign = 'center'; // Center-align text within the paragraph
 
-         //create current clue display
-         const clueText = document.createElement('p');
-         clueText.innerText = "Current Clue : " + this.currentClueMessage;
-         clueText.style.position = 'absolute';
-         clueText.style.top = '35%'; // Center on screen
-         clueText.style.left = '50%';
-         clueText.style.transform = 'translate(-50%, -50%)';
-         clueText.style.fontSize = '35px';
-         clueText.style.color = '#ffffff';
-         clueText.style.width = '1200px'; // Set a specific width
-         clueText.style.backgroundColor = '#000000';  // Black background
-        
-
+    
         // Create an HTML input element overlay
         const inputElement = document.createElement('input');
         inputElement.type = 'text';
         inputElement.style.position = 'absolute';
-        inputElement.style.top = '50%'; // Center on screen
+        inputElement.style.top = '60%'; // Increased position for more spacing
         inputElement.style.left = '50%';
         inputElement.style.transform = 'translate(-50%, -50%)';
         inputElement.style.fontSize = '30px'; // Big enough to match your game's style
         inputElement.style.width = '1200px'; // Set a specific width
         inputElement.style.height = '100px'; // Set a specific height
         inputElement.placeholder = "Enter your question prompt to access the hints";
-
+    
+        // Create Close button
         const closeBtn = document.createElement('button');
-        closeBtn.innerText = "Close";  // Button text
+        closeBtn.innerText = "Close"; // Button text
         closeBtn.style.position = 'absolute';
-        closeBtn.style.top = '60%';  // Position below the input element
+        closeBtn.style.top = '75%'; // Adjusted position for more spacing
         closeBtn.style.left = '50%';
         closeBtn.style.transform = 'translate(-50%, -50%)';
-        closeBtn.style.fontSize = '24px';  // Adjust the font size for the button
-        closeBtn.style.padding = '10px 20px';  // Button padding
-        closeBtn.style.cursor = 'pointer';  // Change cursor on hover
-
+        closeBtn.style.fontSize = '24px'; // Adjust the font size for the button
+        closeBtn.style.padding = '10px 20px'; // Button padding
+        closeBtn.style.cursor = 'pointer'; // Change cursor on hover
+    
+        // Close button functionality
         closeBtn.addEventListener('click', () => {
             document.body.removeChild(modalBackground); // Remove the dialog box
             this.scene.resume(); // Resume the scene
-            this.gptDialogActive = false; 
+            this.gptDialogActive = false;
         });
-       
+    
         document.body.appendChild(modalBackground);
         modalBackground.appendChild(clueText);
         modalBackground.appendChild(inputElement);
         modalBackground.appendChild(closeBtn);
         inputElement.focus(); // Automatically focus the input field
-
-
+    
         // Handle the input submission
         inputElement.addEventListener('keydown', event => {
             if (event.key === 'Enter') {
-                //pass the question as form of prompt to gpt api and get a response back before scene resume
+                // Pass the question as a prompt to the GPT API and get a response back before scene resume
                 let prompt = inputElement.value;
-                const data = {
-                   prompt
-                };
+                const data = { prompt };
                 console.log(JSON.stringify(data));
                 document.body.removeChild(modalBackground);
-                //reduce hint usage
-                let hintLeft = parseInt(this.hintRemaining, 10) - 1; // Subtract 1 from the current life points
+                // Reduce hint usage
+                let hintLeft = parseInt(this.hintRemaining, 10) - 1; // Subtract 1 from the current hint count
                 // Update hint remaining
                 this.hintText.setText('Hints Remaining: ' + hintLeft);
                 this.hintRemaining = hintLeft.toString();
-                //API to call BKT and get student mastery
+    
+                // API to call BKT and get student mastery
                 fetch('http://127.0.0.1:5000/chatgpt', {
                     method: 'POST',
                     headers: {
@@ -587,12 +540,11 @@ class Lounge extends Phaser.Scene {
                 })
                 .then(data => {
                     console.log('ChatGPT response', data);
-                    //access the value obtained
+                    // Access the value obtained
                     let fetchResponse = data.response;
-                    console.log('fetchedResponse', fetchResponse)
-                    //display the response on the game
+                    console.log('fetchedResponse', fetchResponse);
+                    // Display the response on the game
                     this.displayGptResponse(fetchResponse);
-                    //this.interactable = false;
                     this.gptDialogActive = false;  
                 })
                 .catch(error => {
@@ -600,214 +552,126 @@ class Lounge extends Phaser.Scene {
                 });
             }
         });
-
     }
-
-    createWelcomeMessage() {
-
-        this.startTime = this.getCurrentDateTimeForSQL();
-
-        //start timer when they enter the room
-        this.time.addEvent({
-            delay: 1000, // 1000ms = 1 second
-            callback: this.updateTimer,
-            callbackScope: this, // Corrected the typo here
-            loop: true
+    
+    createWelcomeMessage(clueMessage) {
+        // Pause the current scene
+        this.scene.pause();
+    
+        // Create dialog component for the welcome message
+        const welcomeDialogBox = document.createElement('div');
+        welcomeDialogBox.style.position = 'fixed';
+        welcomeDialogBox.style.top = '50%';
+        welcomeDialogBox.style.left = '50%';
+        welcomeDialogBox.style.transform = 'translate(-50%, -50%)';
+        welcomeDialogBox.style.padding = '20px';
+        welcomeDialogBox.style.backgroundColor = '#f5deb3'; // Backup color (wheat-like)
+        welcomeDialogBox.style.backgroundSize = 'cover'; // Ensures the texture covers the box
+        welcomeDialogBox.style.color = '#000000';
+        welcomeDialogBox.style.borderRadius = '10px';
+        welcomeDialogBox.style.border = '5px solid #8B4513'; // Brown border
+        welcomeDialogBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
+        welcomeDialogBox.style.zIndex = '1000';
+        welcomeDialogBox.style.display = 'flex';
+        welcomeDialogBox.style.flexDirection = 'column';
+        welcomeDialogBox.style.justifyContent = 'center';
+        welcomeDialogBox.style.alignItems = 'center';
+    
+        // Set the width based on the clue message length
+        const approximateWidth = Math.min(600, Math.max(300, clueMessage.length * 10));
+        welcomeDialogBox.style.width = `${approximateWidth}px`;
+        welcomeDialogBox.style.maxHeight = '600px'; // Max height limit
+        welcomeDialogBox.style.overflowY = 'auto'; // Scroll for overflow content
+    
+        document.body.appendChild(welcomeDialogBox);
+    
+        // Create and append clue message text
+        const clueText = document.createElement('p');
+        clueText.innerText = clueMessage;
+        clueText.style.textAlign = 'center';
+        clueText.style.fontSize = '20px';
+        clueText.style.margin = '0';
+        clueText.style.fontFamily = '"Press Start 2P", monospace'; // Pixelated font
+        clueText.style.imageRendering = 'pixelated'; // Makes the text look pixelated on certain browsers
+        clueText.style.color = '#8B4513'; // Brown color
+    
+        // Increase spacing between words and lines for better aesthetics
+        clueText.style.wordSpacing = '5px'; // Space between words
+        clueText.style.lineHeight = '1.6'; // Space between lines
+        clueText.style.padding = '10px'; // Add padding for better aesthetics
+    
+        // Append the clue text to the dialog box
+        welcomeDialogBox.appendChild(clueText);
+    
+        // Create Close button below the clue text
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = 'Close';
+        closeButton.style.marginTop = '20px';
+        closeButton.style.padding = '10px 20px';
+        closeButton.style.backgroundColor = '#333';
+        closeButton.style.color = '#ffffff';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '5px';
+        closeButton.style.cursor = 'pointer';
+        welcomeDialogBox.appendChild(closeButton);
+    
+        // Close button functionality
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(welcomeDialogBox); // Remove dialog box
+            this.scene.resume(); // Resume the scene
+            this.startTime = this.getCurrentDateTimeForSQL();
+            //start timer when they enter the room
+            this.time.addEvent({
+                delay: 1000, // 1000ms = 1 second
+                callback: this.updateTimer,
+                callbackScope: this, // Corrected the typo here
+                loop: true
+            });
         });
-
-        // // Calculate the center of the camera view
-        // const cameraCenterX = this.cameras.main.scrollX + this.cameras.main.width / 2;
-        // const cameraCenterY = this.cameras.main.scrollY + this.cameras.main.height / 2;
-        
-        // //hardcoded
-        // // The text of the welcome message
-        // const welcomeText = "Welcome to the Maths Escape Room!\n\n" +
-        //     "Use the arrow keys to move around.\n" +
-        //     "Use SHIFT key to interact with objects.\n\n" +
-        //     "Your first clue is: \n" +//+ this.hints[1]; // Use the first hint as an example
-        //     "Lets play some games at the arcade machine."
-        
-        // // Create the text object for the welcome message
-        // const message = this.add.text(cameraCenterX, cameraCenterY, welcomeText, {
-        //     fontSize: '16px',
-        //     fill: '#ffffff',
-        //     backgroundColor: '#000000bb', // semi-transparent black background
-        //     align: 'center',
-        //     padding: { x: 20, y: 10 },
-        //     wordWrap: { width: this.cameras.main.width * 0.8 / this.cameras.main.zoom }
-        // }).setOrigin(0.5).setScrollFactor(0); // The message should not scroll with the camera
-    
-        // Create the close button below the message
-        // const closeButton = this.add.text(cameraCenterX, message.y + message.height / 2 + 20, 'Close', {
-        //     fontSize: '16px',
-        //     fill: '#ffffff',
-        //     backgroundColor: '#666',
-        //     padding: { x: 10, y: 5 },
-        // }).setOrigin(0.5).setInteractive().setScrollFactor(0); // The button should not scroll with the camera
-    
-        // // When the close button is clicked, hide the message and the button
-        // closeButton.on('pointerdown', () => {
-            
-        //     message.setVisible(false);
-        //     closeButton.setVisible(false);
-
-            // Start the countdown
-            // this.time.addEvent({
-            //     delay: 1000, // 1000ms = 1 second
-            //     callback: this.updateTimer,
-            //     callbackScope: this, // Corrected the typo here
-            //     loop: true
-            // });
-        // });
-    
-        // // Make the welcome message and close button visible
-        // message.setVisible(true);
-        // closeButton.setVisible(true);
     }
+    
 
     //trigger when detect student facing issues
     cutSceneMessage() {
         // Pause scene -> Display Cutscene -> Close Button -> Resume gameplay
         this.scene.pause();
     
-        // Create modal view background
-        const modalBackground = document.createElement('div');
-        modalBackground.style.position = 'fixed';
-        modalBackground.style.top = '0';
-        modalBackground.style.left = '0';
-        modalBackground.style.width = '100%';
-        modalBackground.style.height = '100%';
-        modalBackground.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Grey background
-        modalBackground.style.display = 'flex';
-        modalBackground.style.flexDirection = 'column'; // Stack elements vertically
-        modalBackground.style.justifyContent = 'center';
-        modalBackground.style.alignItems = 'center';
-        modalBackground.style.zIndex = '999'; // Ensure it's on top
-    
-        // Create a container for the carousel
-        const carouselContainer = document.createElement('div');
-        carouselContainer.style.position = 'relative';
-        carouselContainer.style.width = '80%'; // Set width for the container
-        carouselContainer.style.maxWidth = '800px'; // Set a max width for better responsiveness
-        carouselContainer.style.height = '60%'; // Set height for the container
-        carouselContainer.style.overflow = 'hidden'; // Hide overflow
-    
-        // Create a separate image container
-        const imageContainer = document.createElement('div');
-        imageContainer.style.display = 'flex'; // Use flexbox for horizontal arrangement
-        imageContainer.style.transition = 'transform 0.5s ease'; // Smooth transition
-        imageContainer.style.width = '100%'; // Container takes full width
-        imageContainer.style.height = '100%'; // Container takes full height
-        imageContainer.style.alignItems = 'center'; // Center images vertically
-        imageContainer.style.marginTop = '20px'; // Add some margin to separate from the paragraph
-    
-        const hints = [
-            'assets/cutscenes/algebraHint1Factorizing.png',
-            'assets/cutscenes/algebraHint2Simplify.png',
-            'assets/cutscenes/algebraHint3SolveEq.png',
-            'assets/cutscenes/algebraHint4Functions.png',
-            'assets/cutscenes/algebraHint45Simultaneous.png'
-        ];
-    
-        // Current image index
-        let currentIndex = 0;
-    
-        // Function to load the current image
-        const loadImage = (index) => {
-            // Clear the image container
-            imageContainer.innerHTML = '';
-    
-            const img = document.createElement('img');
-            img.src = hints[index];
-            img.alt = `Hint ${index + 1}`; // Corrected syntax for alt text
-            img.style.width = '100%'; // Each image takes full width of its container
-            img.style.height = '100%'; // Each image takes full height of its container
-            img.style.objectFit = 'contain'; // Maintain aspect ratio while showing the full image
-            imageContainer.appendChild(img);
-        };
-    
-        // Load the first image initially
-        loadImage(currentIndex);
-    
-        // Create left and right navigation buttons
-        const leftButton = document.createElement('button');
-        const rightButton = document.createElement('button');
-    
-        leftButton.innerText = '<'; // Left arrow
-        rightButton.innerText = '>'; // Right arrow
-    
-        // Button styles
-        const buttonStyle = {
-            position: 'absolute',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            backgroundColor: 'transparent', // Make the background transparent
-            border: 'none', // No border
-            fontSize: '24px',
-            color: '#808080', // Grey color for the arrows
-            padding: '10px',
-            cursor: 'pointer',
-            zIndex: '1000', // Ensure buttons are above images
-            transition: 'color 0.3s ease', // Smooth transition for color change
-        };
-    
-        Object.assign(leftButton.style, buttonStyle);
-        Object.assign(rightButton.style, buttonStyle);
-    
-        leftButton.style.left = '10px'; // Position left button
-        rightButton.style.right = '10px'; // Position right button
-    
-        // Function to update the carousel
-        const updateCarousel = () => {
-            loadImage(currentIndex); // Load the image for the current index
-        };
-    
-        // Add event listeners for buttons
-        leftButton.addEventListener('click', () => {
-            currentIndex = (currentIndex > 0) ? currentIndex - 1 : hints.length - 1; // Loop to last image
-            updateCarousel();
+        //get current question and then prompt GPT for hints, steps, niche response and scaffolding
+        const currQuest = this.currentQuestion.question;
+        console.log("Current question : " + currQuest);
+
+        let prompt = currQuest;
+        const data = { prompt };
+
+        fetch('http://127.0.0.1:5000/chatgpt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('ChatGPT response', data);
+            // Access the value obtained
+            let fetchResponse = data.response;
+            console.log('fetchedResponse', fetchResponse);
+            //augment abit the fetchedResponse
+            let troubleText = "You seem to be facing some issues...\n Here are some hints!\n";
+            fetchResponse = troubleText + fetchResponse ;
+            // Display the response on the game
+            this.displayGptResponse(fetchResponse);
+            this.gptDialogActive = false;  
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
         });
-    
-        rightButton.addEventListener('click', () => {
-            currentIndex = (currentIndex < hints.length - 1) ? currentIndex + 1 : 0; // Loop to first image
-            updateCarousel();
-        });
-    
-        // Append image container to the carousel container
-        carouselContainer.appendChild(imageContainer);
-    
-        // Append buttons to the carousel container
-        carouselContainer.appendChild(leftButton);
-        carouselContainer.appendChild(rightButton);
-    
-        // Append the carousel container to the modal background
-        modalBackground.appendChild(carouselContainer);
-    
-        // Create a close button
-        const closeButton = document.createElement('button');
-        closeButton.innerText = 'Close';
-        closeButton.style.marginTop = '20px'; // Space between carousel and button
-        closeButton.style.padding = '10px 20px'; // Padding for the button
-        closeButton.style.fontSize = '16px'; // Font size for the button
-        closeButton.style.color = '#ffffff'; // White text color
-        closeButton.style.backgroundColor = '#ff0000'; // Red background color
-        closeButton.style.border = 'none'; // No border
-        closeButton.style.borderRadius = '5px'; // Rounded corners
-        closeButton.style.cursor = 'pointer'; // Cursor change on hover
-        closeButton.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.5)'; // Shadow effect
-        closeButton.style.width = '100px'; // Set a width for the button
-    
-        // Add event listener to close the modal
-        closeButton.addEventListener('click', () => {
-            document.body.removeChild(modalBackground); // Remove the modal from the DOM
-            this.scene.resume(); // Resume the scene (if needed)
-        });
-    
-        // Append the close button to the modal background
-        modalBackground.appendChild(closeButton);
-    
-        // Append the modal background to the body
-        document.body.appendChild(modalBackground);
+
     }
     
     
@@ -1114,7 +978,7 @@ class Lounge extends Phaser.Scene {
             align: 'center',
             wordWrap: { width: this.dialogWidth * 0.8 } // Wrap text within 80% of dialog width
         });
-    
+        
         // Set the question text to visible and position it correctly
         this.questionText.setVisible(true);
         this.questionText.setOrigin(0.5);
