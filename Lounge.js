@@ -416,52 +416,75 @@ class Lounge extends Phaser.Scene {
         
     }
 
-    displayGptResponse(gptResponse){
+    displayGptResponse(gptResponse) {
         console.log("Entered prompt area");
-        //create a dialog component
+    
+        // Create dialog component
         const gptDialogBoxcx = document.createElement('div');
         gptDialogBoxcx.style.position = 'fixed';
         gptDialogBoxcx.style.top = '50%';
         gptDialogBoxcx.style.left = '50%';
         gptDialogBoxcx.style.transform = 'translate(-50%, -50%)';
-        gptDialogBoxcx.style.width = '1000px';
-        gptDialogBoxcx.style.height = '600px';
         gptDialogBoxcx.style.padding = '20px';
-        gptDialogBoxcx.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        gptDialogBoxcx.style.color = '#ffffff';
+        gptDialogBoxcx.style.backgroundColor = '#f5deb3'; // Backup color (wheat-like)
+        gptDialogBoxcx.style.backgroundImage = 'url("path/to/your/parchment.png")'; // Load parchment texture here
+        gptDialogBoxcx.style.backgroundSize = 'cover'; // Ensures the texture covers the box
+        gptDialogBoxcx.style.color = '#000000';
         gptDialogBoxcx.style.borderRadius = '10px';
+        gptDialogBoxcx.style.border = '5px solid #8B4513'; // Brown border
         gptDialogBoxcx.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
-        gptDialogBoxcx.style.zIndex = '1000'; // Ensure it's above other elements
+        gptDialogBoxcx.style.zIndex = '1000';
         gptDialogBoxcx.style.display = 'flex';
-        gptDialogBoxcx.style.flexDirection = 'column'; // Stack elements vertically
-        gptDialogBoxcx.style.justifyContent = 'center'; // Center vertically
-        gptDialogBoxcx.style.alignItems = 'center'; // Center horizontally
+        gptDialogBoxcx.style.flexDirection = 'column';
+        gptDialogBoxcx.style.justifyContent = 'center';
+        gptDialogBoxcx.style.alignItems = 'center';
+    
+        // Dynamically set the dialog box width based on text length
+        const approximateWidth = Math.min(600, Math.max(300, gptResponse.length * 10));
+        gptDialogBoxcx.style.width = `${approximateWidth}px`;
+        gptDialogBoxcx.style.maxHeight = '600px'; // Max height limit
+        gptDialogBoxcx.style.overflowY = 'auto'; // Scroll for overflow content
+    
         document.body.appendChild(gptDialogBoxcx);
-
-        const closeButton = document.createElement('button');
-        closeButton.innerHTML = '✖'; // Close icon
-        closeButton.style.position = 'absolute';
-        closeButton.style.top = '10px';
-        closeButton.style.right = '10px';
-        closeButton.style.background = 'none';
-        closeButton.style.border = 'none';
-        closeButton.style.color = '#ffffff';
-        closeButton.style.fontSize = '20px';
-        closeButton.style.cursor = 'pointer';
-        gptDialogBoxcx.appendChild(closeButton);
-
+    
+        // Create and append response text
         const gptResponseText = document.createElement('p');
         gptResponseText.innerText = gptResponse;
         gptResponseText.style.textAlign = 'center';
-        gptResponseText.style.fontSize = '24px';
+        gptResponseText.style.fontSize = '20px';
+        gptResponseText.style.margin = '0';
+        gptResponseText.style.fontFamily = '"Press Start 2P", monospace'; // Pixelated font
+        gptResponseText.style.imageRendering = 'pixelated'; // Makes the text look pixelated on certain browsers
+        
+        // Set text color to brown
+        gptResponseText.style.color = '#8B4513'; // Brown color
+    
+        // Increase spacing between words and lines for better aesthetics
+        gptResponseText.style.wordSpacing = '5px'; // Space between words
+        gptResponseText.style.lineHeight = '1.6'; // Space between lines
+        gptResponseText.style.padding = '10px'; // Add padding for better aesthetics
         gptDialogBoxcx.appendChild(gptResponseText);
-
+    
+        // Create Close button below the response
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = 'Close';
+        closeButton.style.marginTop = '20px';
+        closeButton.style.padding = '10px 20px';
+        closeButton.style.backgroundColor = '#333';
+        closeButton.style.color = '#ffffff';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '5px';
+        closeButton.style.cursor = 'pointer';
+        gptDialogBoxcx.appendChild(closeButton);
+    
+        // Close button functionality
         closeButton.addEventListener('click', () => {
-            document.body.removeChild(gptDialogBoxcx); // Remove the dialog box
+            document.body.removeChild(gptDialogBoxcx); // Remove dialog box
             this.scene.resume(); // Resume the scene
         });
     }
-
+    
+    
     gptDialog(){
         this.scene.pause();
         this.gptDialogActive = true;
