@@ -144,10 +144,10 @@ def getLatestLProfile():
     cur = conn.cursor(dictionary=True)
     sql_query = "SELECT * FROM learner_model WHERE user_id = %s AND skill = %s ORDER BY created_at DESC;"
     cur.execute(sql_query, (user_id, skill))
-    learnerProfile = cur.fetchone()
+    learnerProfile = cur.fetchall()
     cur.close()
     conn.close()
-    return jsonify(learnerProfile)
+    return jsonify(learnerProfile[0])
 
 #API to call bkt_yt for ASG, call made per questions answered
 @app.route('/getStudentMastery', methods=['POST'])
